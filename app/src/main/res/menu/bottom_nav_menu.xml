@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/nav_retos"
+        android:icon="@drawable/ic_retos"
+        android:title="Retos" />
+
+    <item
+        android:id="@+id/nav_problemas"
+        android:icon="@drawable/ic_problemas"
+        android:title="Problemas" />
+
+    <item
+        android:id="@+id/nav_yo"
+        android:icon="@drawable/ic_yo"
+        android:title="Yo" />
+
+</menu>
