@@ -45,16 +45,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Inicio parte para borrar: solo es para ir a la Home
+
         Intent i = new Intent(MainActivity.this, Home.class);
         startActivity(i);
+
         // Fin parte para borrar
 
     }
-
+    // CLIENTE REST, donde el servidor es el API de GEMINI, y el cliente es la aplicación
     private void llamarAPI() {
         OkHttpClient client = new OkHttpClient();
 
         String apiKey = "AIzaSyD-ee5eQwyZMqWjZjyhcRq9m_JZPMd_1T8";
+
         String json = """
         {
           "contents": [{
@@ -69,8 +72,10 @@ public class MainActivity extends AppCompatActivity {
           }]
         }
         """;
-
+        // PETICIÓN HTTP ENVIANDO EL JSON
         RequestBody body = RequestBody.create(json, MediaType.parse("application/json"));
+
+        // PROTOCOLO HTTPS, usamos post para acceder enviar el prompt al API de gemini
         Request request = new Request.Builder()
                 .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + apiKey)
                 .post(body)
@@ -85,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseBody = response.body().string();
+
+
 
                 Log.i("MainActivity", "Response: " + responseBody);
 
