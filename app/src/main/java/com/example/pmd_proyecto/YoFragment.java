@@ -2,8 +2,11 @@ package com.example.pmd_proyecto;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -12,6 +15,12 @@ import android.view.ViewGroup;
 import android.content.Context;
 import android.widget.TextView;
 
+import android.widget.ImageView;
+import androidx.appcompat.app.AlertDialog;
+
+
+
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,6 +28,13 @@ import android.widget.TextView;
  * create an instance of this fragment.
  */
 public class YoFragment extends Fragment {
+
+    private ActivityResultLauncher<String> seleccionarGaleria;
+    private ActivityResultLauncher<Uri> tomarFoto;
+    private Uri uriFotoCamara;
+    private ImageView avatarView;
+
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -54,6 +70,27 @@ public class YoFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        seleccionarGaleria = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        guardarAvatar(uri);
+                    }
+                }
+        );
+
+        tomarFoto = registerForActivityResult(
+                new ActivityResultContracts.TakePicture(),
+                success -> {
+                    if (success && uriFotoCamara != null) {
+                        guardarAvatar(uriFotoCamara);
+                    }
+                }
+        );
+
+
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -98,6 +135,16 @@ public class YoFragment extends Fragment {
                                    SharedPreferences prefs) {
 
         View view = inflater.inflate(R.layout.fragment_yo, container, false);
+
+        avatarView = view.findViewById(R.id.imageView);
+        avatarView.setOnClickListener(v -> mostrarOpcionesAvatar());
+
+        String avatarUriString = prefs.getString("avatar_uri", null);
+        if (avatarUriString != null) {
+            avatarView.setImageURI(Uri.parse(avatarUriString));
+        }
+
+
         TextView tvEmail = view.findViewById(R.id.tvEmailPerfil);
         TextView tvNombre = view.findViewById(R.id.tvNombrePerfil);
 
@@ -124,5 +171,35 @@ public class YoFragment extends Fragment {
 
         return view;
     }
+
+    private void guardarAvatar(Uri uri) {
+        if (!isAdded()) return;
+
+        SharedPreferences prefs =
+                getContext().getSharedPreferences("session", Context.MODE_PRIVATE);
+
+        prefs.edit()
+                .putString("avatar_uri", uri.toString())
+                .apply();
+
+        if (avatarView != null) {
+            avatarView.setImageURI(null);
+            avatarView.setImageURI(uri);
+        }
+    }
+
+    private void mostrarOpcionesAvatar() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Cambiar avatar")
+                .setItems(new CharSequence[]{"Cámara", "Galería"}, (dialog, which) -> {
+                    if (which == 1) { // which == 1 es galería
+                        seleccionarGaleria.launch("image/*");
+                    }
+                })
+                .show();
+    }
+
+
+
 
 }
