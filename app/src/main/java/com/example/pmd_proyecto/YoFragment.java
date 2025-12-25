@@ -1,5 +1,6 @@
 package com.example.pmd_proyecto;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -7,8 +8,10 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +21,10 @@ import android.widget.TextView;
 import android.widget.ImageView;
 import androidx.appcompat.app.AlertDialog;
 
-
-
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 /**
@@ -136,17 +141,27 @@ public class YoFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_yo, container, false);
 
+
         avatarView = view.findViewById(R.id.imageView);
+        TextView tvEmail = view.findViewById(R.id.tvEmailPerfil);
+        TextView tvNombre = view.findViewById(R.id.tvNombrePerfil);
+
         avatarView.setOnClickListener(v -> mostrarOpcionesAvatar());
 
         String avatarUriString = prefs.getString("avatar_uri", null);
+
         if (avatarUriString != null) {
-            avatarView.setImageURI(Uri.parse(avatarUriString));
+            try {
+                avatarView.setImageURI(Uri.parse(avatarUriString));
+            } catch (SecurityException e) {
+                e.printStackTrace();
+                prefs.edit().remove("avatar_uri").apply();
+
+            } catch (Exception e) {
+                // Captura cualquier otro error de lectura de archivo
+                e.printStackTrace();
+            }
         }
-
-
-        TextView tvEmail = view.findViewById(R.id.tvEmailPerfil);
-        TextView tvNombre = view.findViewById(R.id.tvNombrePerfil);
 
         String email = prefs.getString("email", "usuario");
         tvEmail.setText(email);
@@ -157,11 +172,10 @@ public class YoFragment extends Fragment {
 
         tvNombre.setText(nombre);
 
-
-
-
         view.findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> {
             prefs.edit().clear().apply();
+
+            // Recargar el fragmento (volverá a cargarVistaInvitado)
             requireActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
@@ -175,29 +189,75 @@ public class YoFragment extends Fragment {
     private void guardarAvatar(Uri uri) {
         if (!isAdded()) return;
 
+        Uri localUri = copiarImagenAInterno(uri);
+        if (localUri == null) return;
+
         SharedPreferences prefs =
-                getContext().getSharedPreferences("session", Context.MODE_PRIVATE);
+                requireContext().getSharedPreferences("session", Context.MODE_PRIVATE);
 
         prefs.edit()
-                .putString("avatar_uri", uri.toString())
+                .putString("avatar_uri", localUri.toString())
                 .apply();
 
         if (avatarView != null) {
             avatarView.setImageURI(null);
-            avatarView.setImageURI(uri);
+            avatarView.setImageURI(localUri);
         }
     }
+
+
+
+    private Uri crearUriFoto() {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "avatar_" + System.currentTimeMillis());
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+
+        return requireContext()
+                .getContentResolver()
+                .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+    }
+
 
     private void mostrarOpcionesAvatar() {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Cambiar avatar")
                 .setItems(new CharSequence[]{"Cámara", "Galería"}, (dialog, which) -> {
-                    if (which == 1) { // which == 1 es galería
+                    if (which == 0) { // Cámara
+                        uriFotoCamara = crearUriFoto();
+                        if (uriFotoCamara != null) {
+                            tomarFoto.launch(uriFotoCamara);
+                        }
+                    } else if (which == 1) { // Galería
                         seleccionarGaleria.launch("image/*");
                     }
                 })
                 .show();
     }
+
+    private Uri copiarImagenAInterno(Uri sourceUri) {
+        try {
+            InputStream in = requireContext().getContentResolver().openInputStream(sourceUri);
+            File file = new File(requireContext().getFilesDir(),
+                    "avatar_" + System.currentTimeMillis() + ".jpg");
+
+            OutputStream out = new FileOutputStream(file);
+
+            byte[] buffer = new byte[4096];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+
+            in.close();
+            out.close();
+            return Uri.fromFile(file);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 
 
