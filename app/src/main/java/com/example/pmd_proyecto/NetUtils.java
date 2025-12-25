@@ -41,7 +41,7 @@ public class NetUtils {
                        ... (Pocas palabras que clasifique el tema del problema)
                        
                        [CODIGO]
-                       (maximo 10 lineas)
+                       (maximo 15 lineas, NO TE PASES DE ESTE LIMITE)
                        
                        [OPCIONES] (maximo una linea por cada opcion)
                        [A]...

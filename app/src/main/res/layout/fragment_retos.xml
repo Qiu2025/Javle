@@ -1,14 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context=".RetosFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/retos_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="retos" />
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
-</FrameLayout>
+        <TextView
+            android:id="@+id/retos_textview_pregunta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Pregunta del reto de programación..." />
+
+        <io.github.kbiakov.codeview.CodeView
+            android:id="@+id/retos_code_view"
+            android:layout_width="340dp"
+            android:layout_height="339dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.487"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/retos_textview_pregunta">
+
+        </io.github.kbiakov.codeview.CodeView>
+
+        <LinearLayout
+            android:id="@+id/retos_opciones_container"
+            android:layout_width="383dp"
+            android:layout_height="295dp"
+            android:divider="@drawable/empty_divider"
+            android:orientation="vertical"
+            android:showDividers="middle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/retos_code_view">
+
+            <Button
+                android:id="@+id/retos_button_generar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Generar" />
+
+            <Button
+                android:id="@+id/retos_button_opt1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Opción A" />
+
+            <Button
+                android:id="@+id/retos_button_opt2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Opción B" />
+
+            <Button
+                android:id="@+id/retos_button_opt3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Opción C" />
+
+            <Button
+                android:id="@+id/retos_button_opt4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Opción D" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

@@ -44,16 +44,7 @@ public class Home extends AppCompatActivity {
         });
         // sección inicial
         bottomNav.setSelectedItemId(R.id.nav_home);
-
-
-
-
-
-
-
     }
-
-
 
     @Override
     protected void onResume() {
