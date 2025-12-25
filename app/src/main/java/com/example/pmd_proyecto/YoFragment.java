@@ -1,5 +1,7 @@
 package com.example.pmd_proyecto;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.content.Context;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,8 +62,46 @@ public class YoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_yo, container, false);
+
+        SharedPreferences prefs =
+                requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE);
+
+        boolean logged = prefs.getBoolean("logged", false);
+
+        if (logged) {
+            return cargarVistaPerfil(inflater, container, prefs);
+        } else {
+            return cargarVistaInvitado(inflater, container);
+        }
     }
-    
+
+    private View cargarVistaInvitado(LayoutInflater inflater, ViewGroup container) {
+
+        View view = inflater.inflate(R.layout.fragmento_yo_guest, container, false);
+
+        view.findViewById(R.id.btnLogin).setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), LoginActivity.class))
+        );
+
+        view.findViewById(R.id.btnRegister).setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), RegisterActivity.class))
+        );
+
+        return view;
+    }
+
+    private View cargarVistaPerfil(LayoutInflater inflater,
+                                   ViewGroup container,
+                                   SharedPreferences prefs) {
+
+        View view = inflater.inflate(R.layout.fragment_yo, container, false);
+
+        view.findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> {
+            prefs.edit().clear().apply();
+            requireActivity().recreate();
+        });
+
+        return view;
+    }
+
 }

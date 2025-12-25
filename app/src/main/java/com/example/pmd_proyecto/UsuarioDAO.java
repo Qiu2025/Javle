@@ -30,14 +30,16 @@ public class UsuarioDAO {
         return existe;
     }
 
-    public void registrar(String email, String password) {
+    public boolean registrar(String email, String password) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put("email", email);
         values.put("password", password);
 
-        db.insert("usuarios", null, values);
+        long result = db.insert("usuarios", null, values);
+
+        return result != -1;
     }
 
 

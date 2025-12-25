@@ -1,8 +1,10 @@
 package com.example.pmd_proyecto;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,6 +13,8 @@ public class LoginActivity extends AppCompatActivity {
     EditText etEmail, etPassword;
     Button btnLogin;
     UsuarioDAO usuarioDAO;
+    TextView tvCreateAccount, tvForgotPassword;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,10 +24,13 @@ public class LoginActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        tvCreateAccount = findViewById(R.id.tvCreateAccount);
+        tvForgotPassword = findViewById(R.id.tvForgotPassword);
 
         usuarioDAO = new UsuarioDAO(this);
 
         btnLogin.setOnClickListener(v -> hacerLogin());
+        tvCreateAccount.setOnClickListener(v -> abrirRegistro());
     }
 
 
@@ -36,15 +43,22 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        boolean ok = usuarioDAO.login(email, password);
+        boolean correcto = usuarioDAO.login(email, password);
 
-        if (ok) {
+        if (correcto) {
             Toast.makeText(this, "Login correcto", Toast.LENGTH_SHORT).show();
-            // TODO: ir a la siguiente Activity
+            // startActivity(new Intent(this, HomeActivity.class));
         } else {
             Toast.makeText(this, "Email o contraseña incorrectos", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    private void abrirRegistro() {
+        Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
+    }
+
 
 
 }
