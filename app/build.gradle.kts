@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
 }
@@ -16,6 +19,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "GEMINI_API_KEY", "\"${getLocalProperty("GEMINI_API_KEY")}\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -31,6 +40,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
+    packagingOptions {
+        exclude("META-INF/androidx.appcompat_appcompat.version")
+    }
 }
 
 dependencies {
@@ -45,6 +58,23 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    // for AI API
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    // Gson
+    implementation("com.google.code.gson:gson:2.13.2")
+
+    // Caja de codigo de retos
+    implementation("com.github.kbiakov:CodeView-Android:1.3.2") {
+        exclude(group = "com.android.support")
+    }
+
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+}
+
+// Función auxiliar para leer el archivo properties
+fun getLocalProperty(key: String): String {
+    val properties = Properties()
+    val localPropertiesFile = project.rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        properties.load(FileInputStream(localPropertiesFile))
+    }
+    return properties.getProperty(key) ?: ""
 }
