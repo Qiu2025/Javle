@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.content.Context;
+import android.widget.TextView;
 
 
 /**
@@ -59,6 +60,8 @@ public class YoFragment extends Fragment {
         }
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -95,10 +98,28 @@ public class YoFragment extends Fragment {
                                    SharedPreferences prefs) {
 
         View view = inflater.inflate(R.layout.fragment_yo, container, false);
+        TextView tvEmail = view.findViewById(R.id.tvEmailPerfil);
+        TextView tvNombre = view.findViewById(R.id.tvNombrePerfil);
+
+        String email = prefs.getString("email", "usuario");
+        tvEmail.setText(email);
+
+        String nombre = email.contains("@")
+                ? email.substring(0, email.indexOf("@"))
+                : email;
+
+        tvNombre.setText(nombre);
+
+
+
 
         view.findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> {
             prefs.edit().clear().apply();
-            requireActivity().recreate();
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainerView, new YoFragment())
+                    .commit();
         });
 
         return view;

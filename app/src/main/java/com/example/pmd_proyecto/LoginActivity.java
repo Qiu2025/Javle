@@ -1,6 +1,7 @@
 package com.example.pmd_proyecto;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,12 +48,20 @@ public class LoginActivity extends AppCompatActivity {
 
         if (correcto) {
             Toast.makeText(this, "Login correcto", Toast.LENGTH_SHORT).show();
-            // startActivity(new Intent(this, HomeActivity.class));
+            guardarSesion(email);
+            finish();
         } else {
             Toast.makeText(this, "Email o contraseña incorrectos", Toast.LENGTH_SHORT).show();
         }
     }
 
+    private void guardarSesion(String email) {
+        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+        prefs.edit()
+                .putBoolean("logged", true)
+                .putString("email", email)
+                .apply();
+    }
 
     private void abrirRegistro() {
         Intent intent = new Intent(this, RegisterActivity.class);

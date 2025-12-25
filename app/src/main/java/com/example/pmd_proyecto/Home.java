@@ -52,4 +52,24 @@ public class Home extends AppCompatActivity {
 
 
     }
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        boolean logged = getSharedPreferences("session", MODE_PRIVATE)
+                .getBoolean("logged", false);
+
+        Fragment actual = getSupportFragmentManager()
+                .findFragmentById(R.id.fragmentContainerView);
+
+        if (logged && actual instanceof YoFragment) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainerView, new YoFragment())
+                    .commit();
+        }
+    }
 }

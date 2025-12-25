@@ -46,8 +46,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Inicio parte para borrar: solo es para ir a la Home
 
+        /*
         Intent i = new Intent(MainActivity.this, Home.class);
         startActivity(i);
+        */
 
         // Fin parte para borrar
 
