@@ -3,6 +3,8 @@ package com.example.pmd_proyecto;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -140,41 +142,42 @@ public class YoFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_yo, container, false);
 
-
         avatarView = view.findViewById(R.id.imageView);
         TextView tvEmail = view.findViewById(R.id.tvEmailPerfil);
         TextView tvNombre = view.findViewById(R.id.tvNombrePerfil);
 
         avatarView.setOnClickListener(v -> mostrarOpcionesAvatar());
 
-        String avatarUriString = prefs.getString("avatar_uri", null);
+        String email = prefs.getString("email", null);
 
-        if (avatarUriString != null) {
-            try {
-                avatarView.setImageURI(Uri.parse(avatarUriString));
-            } catch (SecurityException e) {
-                e.printStackTrace();
-                prefs.edit().remove("avatar_uri").apply();
+        if (email != null) {
+            tvEmail.setText(email);
 
-            } catch (Exception e) {
-                // Captura cualquier otro error de lectura de archivo
-                e.printStackTrace();
+            String nombre = email.contains("@")
+                    ? email.substring(0, email.indexOf("@"))
+                    : email;
+            tvNombre.setText(nombre);
+
+            DBHelper dbHelper = new DBHelper(requireContext());
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+            Cursor c = db.rawQuery(
+                    "SELECT avatar FROM usuarios WHERE email = ?",
+                    new String[]{email}
+            );
+
+            if (c.moveToFirst()) {
+                String avatarUriString = c.getString(0);
+                if (avatarUriString != null) {
+                    avatarView.setImageURI(Uri.parse(avatarUriString));
+                }
             }
+            c.close();
         }
-
-        String email = prefs.getString("email", "usuario");
-        tvEmail.setText(email);
-
-        String nombre = email.contains("@")
-                ? email.substring(0, email.indexOf("@"))
-                : email;
-
-        tvNombre.setText(nombre);
 
         view.findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> {
             prefs.edit().clear().apply();
 
-            // Recargar el fragmento (volverá a cargarVistaInvitado)
             requireActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
@@ -194,14 +197,28 @@ public class YoFragment extends Fragment {
         SharedPreferences prefs =
                 requireContext().getSharedPreferences("session", Context.MODE_PRIVATE);
 
-        prefs.edit()
-                .putString("avatar_uri", localUri.toString())
-                .apply();
+        String email = prefs.getString("email", null);
+        if (email == null) return;
 
-        if (avatarView != null) {
-            avatarView.setImageURI(null);
-            avatarView.setImageURI(localUri);
-        }
+        DBHelper dbHelper = new DBHelper(requireContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("avatar", localUri.toString());
+
+        db.update(
+                "usuarios",
+                values,
+                "email = ?",
+                new String[]{email}
+        );
+
+        // Recargar perfil
+        requireActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainerView, new YoFragment())
+                .commit();
     }
 
 

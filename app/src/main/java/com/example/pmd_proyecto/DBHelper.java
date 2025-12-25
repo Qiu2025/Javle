@@ -8,7 +8,7 @@ import android.content.Context;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "app.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -20,13 +20,15 @@ public class DBHelper extends SQLiteOpenHelper {
                 "CREATE TABLE usuarios (" +
                         "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "email TEXT UNIQUE, " +
-                        "password TEXT)"
+                        "password TEXT, " +
+                        "avatar TEXT)"
         );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS usuarios");
-        onCreate(db);
+        if (oldVersion < 2) {
+            db.execSQL("ALTER TABLE usuarios ADD COLUMN avatar TEXT");
+        }
     }
 }
