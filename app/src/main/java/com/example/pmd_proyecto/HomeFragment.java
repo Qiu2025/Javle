@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HomeFragment#newInstance} factory method to
@@ -58,7 +60,27 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        // Referencia al botón
+        View btnStart = view.findViewById(R.id.btnStart);
+
+        btnStart.setOnClickListener(v -> {
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainerView, new RetosFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+            // Actualizar el menú inferior
+            BottomNavigationView bottomNav =
+                    requireActivity().findViewById(R.id.menu);
+
+            bottomNav.setSelectedItemId(R.id.nav_retos);
+        });
+
+        return view;
     }
 }
