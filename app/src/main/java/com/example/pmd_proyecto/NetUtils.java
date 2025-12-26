@@ -125,39 +125,43 @@ public class NetUtils {
 
         try {
             GeminiResponse objetoFull = gson.fromJson(respuestaJson, GeminiResponse.class);
-            String textoBruto = objetoFull.candidates.get(0).content.parts.get(0).text;
-            Log.d("DEBUG_IA", "Respuesta real de la IA:\n" + textoBruto);
 
-            // Dividimos el texto en cuatro partes usando las etiquetas
-            String[] partes = textoBruto.split("\\[PREGUNTA\\]|\\[CODIGO\\]|\\[OPCIONES\\]|\\[CORRECTA\\]");
+            // Verificamos que haya candidatos antes de acceder
+            if (objetoFull != null && objetoFull.candidates != null && !objetoFull.candidates.isEmpty()) {
+                String textoBruto = objetoFull.candidates.get(0).content.parts.get(0).text;
+                Log.d("DEBUG_IA", "Respuesta real de la IA:\n" + textoBruto);
 
-            // partes[0] suele estar vacío porque el texto empieza con [PREGUNTA]
-            // partes[1] -> Pregunta
-            // partes[2] -> Código
-            // partes[3] -> Opciones
-            // partes[4] -> Correcta
+                // Dividimos el texto en cuatro partes usando las etiquetas
+                String[] partes = textoBruto.split("\\[PREGUNTA\\]|\\[CODIGO\\]|\\[OPCIONES\\]|\\[CORRECTA\\]");
 
-            if (partes.length >= 5) {
-                // Pregunta
-                reto.pregunta = partes[1].trim();
+                // partes[0] suele estar vacío porque el texto empieza con [PREGUNTA]
+                // partes[1] -> Pregunta
+                // partes[2] -> Código
+                // partes[3] -> Opciones
+                // partes[4] -> Correcta
 
-                // Codigo
-                String codigo = partes[2].replaceAll("```java|```", "").trim();
-                reto.codigo = codigo;
+                if (partes.length >= 5) {
+                    // Pregunta
+                    reto.pregunta = partes[1].trim();
 
-                // Opciones
-                String bloqueOpciones = partes[3].trim();
-                String[] arrayOpciones = bloqueOpciones.split("(?=\\[[A-D]\\])");
-                reto.opciones = new ArrayList<>();
-                for (String opt : arrayOpciones) {
-                    if (!opt.trim().isEmpty()) reto.opciones.add(opt.trim());
+                    // Codigo
+                    String codigo = partes[2].replaceAll("```java|```", "").trim();
+                    reto.codigo = codigo;
+
+                    // Opciones
+                    String bloqueOpciones = partes[3].trim();
+                    String[] arrayOpciones = bloqueOpciones.split("(?=\\[[A-D]\\])");
+                    reto.opciones = new ArrayList<>();
+                    for (String opt : arrayOpciones) {
+                        if (!opt.trim().isEmpty()) reto.opciones.add(opt.trim());
+                    }
+
+                    // Respuesta
+                    reto.respuestaCorrecta = partes[4].trim();
+                } else {
+                    reto.pregunta = "Error: El formato de la IA no fue el esperado.";
+                    Log.e("Parseo", "Texto recibido: " + textoBruto);
                 }
-
-                // Respuesta
-                reto.respuestaCorrecta = partes[4].trim();
-            } else {
-                reto.pregunta = "Error: El formato de la IA no fue el esperado.";
-                Log.e("Parseo", "Texto recibido: " + textoBruto);
             }
 
         } catch (Exception e) {
