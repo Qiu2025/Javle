@@ -8,11 +8,9 @@ import com.example.pmd_proyecto.model.RetoProgramacion;
 
 public class GenerarRetoThread implements Runnable {
     private Context ctx;
-    private RetosFragment rf;
 
-    public GenerarRetoThread(Context ctx, RetosFragment rf) {
+    public GenerarRetoThread(Context ctx) {
         this.ctx = ctx;
-        this.rf = rf;
     }
 
     @Override
@@ -22,8 +20,7 @@ public class GenerarRetoThread implements Runnable {
 
             ((Activity)ctx).runOnUiThread(new Runnable() {
                 @Override
-                public void run() {
-                    rf.mostrarReto(reto);
+                public void run() {((RetosActivity)ctx).mostrarReto(reto);
                 }
             });
         } catch (Exception e) {
