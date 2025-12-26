@@ -3,6 +3,8 @@ package com.example.pmd_proyecto;
 import android.util.Log;
 
 import com.example.pmd_proyecto.model.GeminiResponse;
+import com.example.pmd_proyecto.model.Problem;
+import com.example.pmd_proyecto.model.ProblemsetResponse;
 import com.example.pmd_proyecto.model.RetoProgramacion;
 import com.google.gson.Gson;
 
@@ -10,8 +12,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class NetUtils {
     private static final String apiKey = BuildConfig.GEMINI_API_KEY;
@@ -161,5 +166,28 @@ public class NetUtils {
         }
 
         return reto;
+    }
+
+    public static List<Problem> ConsultarProblemas(){
+        try {
+            URL url = new URL("https://codeforces.com/api/problemset.problems?tags=implementation");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            // Leer la respuesta
+            StringBuilder response = new StringBuilder();
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            Gson gson = new Gson();
+            ProblemsetResponse respuesta = gson.fromJson(response.toString(), ProblemsetResponse.class);
+            return respuesta.result.problems;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

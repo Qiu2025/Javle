@@ -1,12 +1,23 @@
 package com.example.pmd_proyecto;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import com.example.pmd_proyecto.model.Problem;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +34,10 @@ public class ProblemasFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    ListView lv;
+    ProblemAdapter adapter;
+    Context ctx;
 
     public ProblemasFragment() {
         // Required empty public constructor
@@ -60,5 +75,20 @@ public class ProblemasFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_problemas, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        lv = view.findViewById(R.id.lista_problemas);
+
+        ConsultarProblemasThread task = new ConsultarProblemasThread(requireActivity(), ProblemasFragment.this);
+        new Thread(task).start();
+    }
+
+    public void mostrarProblemas(List<Problem> problemas){
+        ProblemAdapter adapter = new ProblemAdapter(requireActivity(), problemas);
+        lv.setAdapter(adapter);
     }
 }
