@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class Home extends AppCompatActivity {
+    private Fragment homeF, retosF, problemasF, yoF;
+    private Fragment active;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,23 +28,41 @@ public class Home extends AppCompatActivity {
 
         BottomNavigationView bottomNav = findViewById(R.id.menu);
 
+        // Crear instancias una vez
+        homeF = new HomeFragment();
+        retosF = new RetosFragment();
+        problemasF = new ProblemasFragment();
+        yoF = new YoFragment();
+
+        // Añadir todas una vez, mostrando solo Home
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragmentContainerView, yoF, "YO").hide(yoF)
+                .add(R.id.fragmentContainerView, problemasF, "PROB").hide(problemasF)
+                .add(R.id.fragmentContainerView, retosF, "RETOS").hide(retosF)
+                .add(R.id.fragmentContainerView, homeF, "HOME")
+                .commit();
+
+        active = homeF;
+
         bottomNav.setOnItemSelectedListener(item -> {
-            Fragment f;
+            Fragment target;
             int id = item.getItemId();
 
-            if (id == R.id.nav_home) f = new HomeFragment();
-            else if (id == R.id.nav_retos) f = new RetosFragment();
-            else if (id == R.id.nav_problemas) f = new ProblemasFragment();
-            else f = new YoFragment();
+            if (id == R.id.nav_home) target = homeF;
+            else if (id == R.id.nav_retos) target = retosF;
+            else if (id == R.id.nav_problemas) target = problemasF;
+            else target = yoF;
 
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragmentContainerView, f)
+                    .hide(active)
+                    .show(target)
                     .commit();
-
+            active = target;
             return true;
         });
-        // sección inicial
+//        Fragmento nicial
         bottomNav.setSelectedItemId(R.id.nav_home);
     }
 

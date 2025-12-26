@@ -44,23 +44,14 @@ public class ProblemAdapter extends BaseAdapter {
 
         Problem p = datos.get(i);
 
-        ((TextView) convertView.findViewById(R.id.tvName))
-                .setText(p.getName());
+        ((TextView) convertView.findViewById(R.id.tvId))
+                .setText("ID " + p.getId());
 
-        // Ej: "5C" o "5C • acmsguru"
-        ((TextView) convertView.findViewById(R.id.tvCode))
-                .setText(p.getContestId() + "" + p.getIndex() +
-                        (p.getProblemsetName() != null ? " • " + p.getProblemsetName() : ""));
+        ((TextView) convertView.findViewById(R.id.tvTitle))
+                .setText(p.getTitle());
 
-        ((TextView) convertView.findViewById(R.id.tvRating))
-                .setText(p.getRating() + "");
-
-        ((TextView) convertView.findViewById(R.id.tvType))
-                .setText(p.getType());
-
-        // tags como texto: "implementation • math"
-        ((TextView) convertView.findViewById(R.id.tvTags))
-                .setText(p.getTags() != null ? String.join(" • ", p.getTags()) : "");
+        ((TextView) convertView.findViewById(R.id.tvDifficulty))
+                .setText(p.getDifficulty());
 
         return convertView;
     }

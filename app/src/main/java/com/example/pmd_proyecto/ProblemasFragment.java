@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -83,11 +84,12 @@ public class ProblemasFragment extends Fragment {
 
         lv = view.findViewById(R.id.lista_problemas);
 
-        ConsultarProblemasThread task = new ConsultarProblemasThread(requireActivity(), ProblemasFragment.this);
+        ConsultarProblemasThread task = new ConsultarProblemasThread(ProblemasFragment.this);
         new Thread(task).start();
     }
 
     public void mostrarProblemas(List<Problem> problemas){
+        if (!isAdded() || getActivity() == null || lv == null) return;
         ProblemAdapter adapter = new ProblemAdapter(requireActivity(), problemas);
         lv.setAdapter(adapter);
     }

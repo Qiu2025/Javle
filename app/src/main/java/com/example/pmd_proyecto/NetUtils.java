@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.example.pmd_proyecto.model.GeminiResponse;
 import com.example.pmd_proyecto.model.Problem;
-import com.example.pmd_proyecto.model.ProblemsetResponse;
 import com.example.pmd_proyecto.model.RetoProgramacion;
 import com.google.gson.Gson;
 
@@ -12,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -174,7 +172,7 @@ public class NetUtils {
 
     public static List<Problem> ConsultarProblemas(){
         try {
-            URL url = new URL("https://codeforces.com/api/problemset.problems?tags=implementation");
+            URL url = new URL("https://leetcode-api-pied.vercel.app/problems");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
@@ -187,8 +185,7 @@ public class NetUtils {
             }
             in.close();
             Gson gson = new Gson();
-            ProblemsetResponse respuesta = gson.fromJson(response.toString(), ProblemsetResponse.class);
-            return respuesta.result.problems;
+            return Arrays.asList(gson.fromJson(response.toString(), Problem[].class));
         } catch (Exception e) {
             e.printStackTrace();
         }

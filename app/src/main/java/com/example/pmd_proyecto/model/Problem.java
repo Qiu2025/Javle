@@ -3,80 +3,40 @@ package com.example.pmd_proyecto.model;
 import java.util.Arrays;
 
 public class Problem {
-    private Integer contestId;
-    private String problemsetName;
-    private String index;
-    private String name;
-    private String type;
-    private Integer rating;
-    private String[] tags;
+    private Integer id;
+    private String title;
+    private String url;
+    private String difficulty;
 
-    public String[] getTags() {
-        return tags;
+    public Integer getId() {
+        return id;
     }
 
-    public void setTags(String[] tags) {
-        this.tags = tags;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public Integer getRating() {
-        return rating;
+    public String getTitle() {
+        return title;
     }
 
-    public void setRating(Integer rating) {
-        this.rating = rating;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getType() {
-        return type;
+    public String getUrl() {
+        return url;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
-    public String getName() {
-        return name;
+    public String getDifficulty() {
+        return difficulty;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getIndex() {
-        return index;
-    }
-
-    public void setIndex(String index) {
-        this.index = index;
-    }
-
-    public String getProblemsetName() {
-        return problemsetName;
-    }
-
-    public void setProblemsetName(String problemsetName) {
-        this.problemsetName = problemsetName;
-    }
-
-    public Integer getContestId() {
-        return contestId;
-    }
-
-    public void setContestId(Integer contestId) {
-        this.contestId = contestId;
-    }
-
-    @Override
-    public String toString() {
-        return "Problem{" +
-                "contestId=" + contestId +
-                ", problemsetName='" + problemsetName + '\'' +
-                ", index='" + index + '\'' +
-                ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", rating=" + rating +
-                ", tags=" + Arrays.toString(tags) +
-                '}';
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
     }
 }

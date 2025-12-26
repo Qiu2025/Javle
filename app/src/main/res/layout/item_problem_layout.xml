@@ -15,70 +15,44 @@
         android:orientation="vertical"
         android:padding="14dp">
 
-        <!-- Nombre del problema -->
-        <TextView
-            android:id="@+id/tvName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Two Sum"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:maxLines="2"
-            android:ellipsize="end" />
-
-        <!-- Línea secundaria: contestId + index + problemsetName (opcional) -->
-        <TextView
-            android:id="@+id/tvCode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="5C • problemsetName"
-            android:textColor="#6B7280"
-            android:textSize="12sp"
-            android:maxLines="1"
-            android:ellipsize="end" />
-
-        <!-- Badges: rating, type -->
+        <!-- Fila superior: ID + dificultad (badge) -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/tvRating"
-                android:layout_width="wrap_content"
+                android:id="@+id/tvId"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
-                android:text="★ 1200"
+                android:layout_weight="1"
+                android:text="ID 1"
                 android:textSize="12sp"
-                android:textColor="#111827"
-                android:background="@drawable/bg_badge"
-                android:layout_marginEnd="8dp" />
+                android:textColor="#6B7280" />
 
             <TextView
-                android:id="@+id/tvType"
+                android:id="@+id/tvDifficulty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
-                android:text="PROGRAMMING"
+                android:text="Easy"
                 android:textSize="12sp"
                 android:textColor="#111827"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
                 android:background="@drawable/bg_badge" />
         </LinearLayout>
 
-        <!-- Tags -->
+        <!-- Título -->
         <TextView
-            android:id="@+id/tvTags"
+            android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="implementation • math • greedy"
-            android:textColor="#374151"
-            android:textSize="12sp"
+            android:layout_marginTop="8dp"
+            android:text="Two Sum"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
             android:maxLines="2"
             android:ellipsize="end" />
 
