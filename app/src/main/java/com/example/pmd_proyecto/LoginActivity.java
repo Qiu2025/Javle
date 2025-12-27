@@ -61,7 +61,11 @@ public class LoginActivity extends AppCompatActivity {
                 .putBoolean("logged", true)
                 .putBoolean("from_login", true)
                 .putString("email", email)
-                .commit();
+                .apply();
+
+        DBHelper dbHelper = new DBHelper(this);
+        dbHelper.asegurarProgresoUsuario(email);
+
         Intent intent = new Intent(LoginActivity.this, Home.class);
         startActivity(intent);
         finish();

@@ -45,6 +45,7 @@
                 android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/tv_aciertos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"
@@ -77,6 +78,7 @@
                 android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/tv_fallos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"

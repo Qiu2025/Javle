@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.SharedPreferences;
+
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,12 +28,20 @@ public class RetosActivity extends AppCompatActivity {
     private CodeView codeView;
     private Button btnOpt1, btnOpt2, btnOpt3, btnOpt4;
     private RetoProgramacion retoActual;
+    private String emailUsuario;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_retos);
+
+        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+        emailUsuario = prefs.getString("email", null);
+
+        Log.d("RETOS", "Usuario en sesión: " + emailUsuario);
+
         CodeProcessor.init(this);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -111,18 +121,26 @@ public class RetosActivity extends AppCompatActivity {
         }
     }
 
+
     private void comprobarRespuesta(String letraSeleccionada, View botonPulsado, RetoProgramacion reto) {
         if (reto == null) return;
+
+        DBHelper dbHelper = new DBHelper(this);
 
         if (letraSeleccionada.equals(reto.respuestaCorrecta)) {
             botonPulsado.setBackgroundColor(getColor(android.R.color.holo_green_light));
             Toast.makeText(this, "Correcto!", Toast.LENGTH_SHORT).show();
+
+            dbHelper.sumarAcierto(emailUsuario);
+
         } else {
             botonPulsado.setBackgroundColor(getColor(android.R.color.holo_red_light));
             Toast.makeText(this, "Incorrecto!", Toast.LENGTH_SHORT).show();
+
+            dbHelper.sumarFallo(emailUsuario);
         }
 
-        // Deshabilitar botones para que no sigan pulsando
+        // Deshabilitar botones
         btnOpt1.setEnabled(false);
         btnOpt2.setEnabled(false);
         btnOpt3.setEnabled(false);

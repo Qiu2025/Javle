@@ -9,6 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -18,6 +21,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  * create an instance of this fragment.
  */
 public class RetosFragment extends Fragment {
+
+    private TextView tvAciertos;
+    private TextView tvFallos;
+    private String emailUsuario;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -62,15 +69,42 @@ public class RetosFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_retos, container, false);
+
+        tvAciertos = view.findViewById(R.id.tv_aciertos);
+        tvFallos = view.findViewById(R.id.tv_fallos);
+
+        // Para leer los email del usuario en sesión
+        SharedPreferences prefs =
+                requireContext().getSharedPreferences("session", Context.MODE_PRIVATE);
+        emailUsuario = prefs.getString("email", null);
+
+        // Cargar progreso inicial
+        cargarProgreso();
 
         Button btnEmpezar = view.findViewById(R.id.fretos_btn_empezar);
         btnEmpezar.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), RetosActivity.class);
             startActivity(intent);
-            });
+        });
 
         return view;
     }
+
+    private void cargarProgreso() {
+        if (emailUsuario == null) return;
+
+        DBHelper dbHelper = new DBHelper(requireContext());
+        int[] progreso = dbHelper.obtenerProgreso(emailUsuario);
+
+        tvAciertos.setText(String.valueOf(progreso[0]));
+        tvFallos.setText(String.valueOf(progreso[1]));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        cargarProgreso();
+    }
+
 }

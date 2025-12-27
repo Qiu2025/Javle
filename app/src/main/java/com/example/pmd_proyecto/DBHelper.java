@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "app.db";
-    private static final int DB_VERSION = 7; // Incrementamos versión
+    private static final int DB_VERSION = 9; // Incrementamos versión
 
     // Tabla Retos
     public static final String TABLE_RETOS = "retos";
@@ -24,6 +24,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COL_CODIGO = "codigo";
     public static final String COL_OPCIONES = "opciones"; // Guardado como texto separado
     public static final String COL_RESPUESTA = "respuesta_correcta";
+    public static final String TABLE_PROGRESO = "progreso";
+    public static final String COL_EMAIL = "email";
+    public static final String COL_ACIERTOS = "aciertos";
+    public static final String COL_FALLOS = "fallos";
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -39,6 +43,15 @@ public class DBHelper extends SQLiteOpenHelper {
                         "password TEXT, " +
                         "avatar TEXT)"
         );
+
+        db.execSQL(
+                "CREATE TABLE progreso (" +
+                        "email TEXT PRIMARY KEY, " +
+                        "aciertos INTEGER DEFAULT 0, " +
+                        "fallos INTEGER DEFAULT 0, " +
+                        "FOREIGN KEY(email) REFERENCES usuarios(email))"
+        );
+
         // Nueva tabla retos
         crearTablaRetos(db);
     }
@@ -61,6 +74,16 @@ public class DBHelper extends SQLiteOpenHelper {
         if (oldVersion < 3) {
             crearTablaRetos(db);
         }
+
+        if (oldVersion < 9) {
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS progreso (" +
+                            "email TEXT PRIMARY KEY, " +
+                            "aciertos INTEGER DEFAULT 0, " +
+                            "fallos INTEGER DEFAULT 0)"
+            );
+        }
+
     }
 
     // --- MÉTODOS PARA GESTIÓN DE RETOS ---
@@ -116,4 +139,73 @@ public class DBHelper extends SQLiteOpenHelper {
         cursor.close();
         return count;
     }
+
+    public void asegurarProgresoUsuario(String email) {
+        if (email == null) return;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor c = db.query(
+                TABLE_PROGRESO,
+                new String[]{COL_EMAIL},
+                COL_EMAIL + " = ?",
+                new String[]{email},
+                null, null, null
+        );
+
+        boolean existe = c.moveToFirst();
+        c.close();
+
+        if (!existe) {
+            ContentValues values = new ContentValues();
+            values.put(COL_EMAIL, email);
+            values.put(COL_ACIERTOS, 0);
+            values.put(COL_FALLOS, 0);
+            db.insert(TABLE_PROGRESO, null, values);
+        }
+    }
+
+    public void sumarAcierto(String email) {
+        if (email == null) return;
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(
+                "UPDATE " + TABLE_PROGRESO +
+                        " SET " + COL_ACIERTOS + " = " + COL_ACIERTOS + " + 1 " +
+                        " WHERE " + COL_EMAIL + " = ?",
+                new Object[]{email}
+        );
+    }
+
+    public void sumarFallo(String email) {
+        if (email == null) return;
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(
+                "UPDATE " + TABLE_PROGRESO +
+                        " SET " + COL_FALLOS + " = " + COL_FALLOS + " + 1 " +
+                        " WHERE " + COL_EMAIL + " = ?",
+                new Object[]{email}
+        );
+    }
+
+    public int[] obtenerProgreso(String email) {
+        int[] resultado = new int[]{0, 0}; // [aciertos, fallos]
+        if (email == null) return resultado;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.query(
+                TABLE_PROGRESO,
+                new String[]{COL_ACIERTOS, COL_FALLOS},
+                COL_EMAIL + " = ?",
+                new String[]{email},
+                null, null, null
+        );
+
+        if (c.moveToFirst()) {
+            resultado[0] = c.getInt(0);
+            resultado[1] = c.getInt(1);
+        }
+        c.close();
+        return resultado;
+    }
+
 }
