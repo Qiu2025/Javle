@@ -183,6 +183,7 @@ public class YoFragment extends Fragment {
                     .apply();
 
             Intent intent = new Intent(requireActivity(), Home.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             requireActivity().finish();
         });
