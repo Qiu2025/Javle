@@ -7,15 +7,16 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.example.pmd_proyecto.model.ErrorReto;
 import com.example.pmd_proyecto.model.RetoProgramacion;
-
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "app.db";
-    private static final int DB_VERSION = 9; // Incrementamos versión
+    private static final int DB_VERSION = 10; // Incrementamos versión
 
     // Tabla Retos
     public static final String TABLE_RETOS = "retos";
@@ -28,6 +29,12 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COL_EMAIL = "email";
     public static final String COL_ACIERTOS = "aciertos";
     public static final String COL_FALLOS = "fallos";
+
+    public static final String TABLE_ERRORES = "errores";
+    public static final String COL_PREGUNTA_ERR = "pregunta";
+    public static final String COL_RESPUESTA_ERR = "respuesta_correcta";
+    public static final String COL_FECHA = "fecha";
+
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -50,6 +57,17 @@ public class DBHelper extends SQLiteOpenHelper {
                         "aciertos INTEGER DEFAULT 0, " +
                         "fallos INTEGER DEFAULT 0, " +
                         "FOREIGN KEY(email) REFERENCES usuarios(email))"
+        );
+
+
+        // para almacenar errores
+        db.execSQL(
+                "CREATE TABLE errores (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "email TEXT, " +
+                        "pregunta TEXT, " +
+                        "respuesta_correcta TEXT, " +
+                        "fecha INTEGER)"
         );
 
         // Nueva tabla retos
@@ -81,6 +99,17 @@ public class DBHelper extends SQLiteOpenHelper {
                             "email TEXT PRIMARY KEY, " +
                             "aciertos INTEGER DEFAULT 0, " +
                             "fallos INTEGER DEFAULT 0)"
+            );
+        }
+
+        if (oldVersion < 10) {
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS errores (" +
+                            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                            "email TEXT, " +
+                            "pregunta TEXT, " +
+                            "respuesta_correcta TEXT, " +
+                            "fecha INTEGER)"
             );
         }
 
@@ -207,5 +236,49 @@ public class DBHelper extends SQLiteOpenHelper {
         c.close();
         return resultado;
     }
+
+    public void guardarError(String email, RetoProgramacion reto) {
+        if (email == null || reto == null) return;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("email", email);
+        values.put(COL_PREGUNTA_ERR, reto.pregunta);
+        values.put(COL_RESPUESTA_ERR, reto.respuestaCorrecta);
+        values.put(COL_FECHA, System.currentTimeMillis());
+
+        db.insert(TABLE_ERRORES, null, values);
+    }
+
+    public List<ErrorReto> obtenerErrores(String email) {
+        List<ErrorReto> lista = new ArrayList<>();
+
+        if (email == null) return lista;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(
+                "errores",
+                new String[]{"pregunta", "respuesta_correcta", "fecha"},
+                "email = ?",
+                new String[]{email},
+                null,
+                null,
+                "fecha DESC"
+        );
+
+        while (cursor.moveToNext()) {
+            String pregunta = cursor.getString(0);
+            String respuesta = cursor.getString(1);
+            long fecha = cursor.getLong(2);
+
+            lista.add(new ErrorReto(pregunta, respuesta, fecha));
+        }
+
+        cursor.close();
+        return lista;
+    }
+
+
 
 }

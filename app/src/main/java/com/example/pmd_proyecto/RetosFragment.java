@@ -13,8 +13,6 @@ import android.widget.TextView;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link RetosFragment#newInstance} factory method to
@@ -25,6 +23,8 @@ public class RetosFragment extends Fragment {
     private TextView tvAciertos;
     private TextView tvFallos;
     private String emailUsuario;
+    private Button btnHistoryFailures;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -87,6 +87,18 @@ public class RetosFragment extends Fragment {
             Intent intent = new Intent(getActivity(), RetosActivity.class);
             startActivity(intent);
         });
+
+        btnHistoryFailures = view.findViewById(R.id.btn_history_failures);
+
+        btnHistoryFailures.setOnClickListener(v -> {
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainerView, new ErroresFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
+
 
         return view;
     }

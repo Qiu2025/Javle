@@ -138,6 +138,7 @@ public class RetosActivity extends AppCompatActivity {
             Toast.makeText(this, "Incorrecto!", Toast.LENGTH_SHORT).show();
 
             dbHelper.sumarFallo(emailUsuario);
+            dbHelper.guardarError(emailUsuario, reto);
         }
 
         // Deshabilitar botones
