@@ -1,6 +1,7 @@
 package com.example.pmd_proyecto;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,7 +13,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.pmd_proyecto.model.Problem;
 
@@ -38,7 +42,7 @@ public class ProblemasFragment extends Fragment {
 
     ListView lv;
     ProblemAdapter adapter;
-    Context ctx;
+    List<Problem> problemas;
 
     public ProblemasFragment() {
         // Required empty public constructor
@@ -86,11 +90,21 @@ public class ProblemasFragment extends Fragment {
 
         ConsultarProblemasThread task = new ConsultarProblemasThread(ProblemasFragment.this);
         new Thread(task).start();
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), EnunciadoActivity.class);
+                intent.putExtra("ID", ""+(position+1));
+                startActivity(intent);
+            }
+        });
     }
 
     public void mostrarProblemas(List<Problem> problemas){
         if (!isAdded() || getActivity() == null || lv == null) return;
-        ProblemAdapter adapter = new ProblemAdapter(requireActivity(), problemas);
+        this.problemas = problemas;
+        adapter = new ProblemAdapter(requireActivity(), this.problemas);
         lv.setAdapter(adapter);
     }
 }

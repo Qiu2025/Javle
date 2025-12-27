@@ -2,6 +2,7 @@ package com.example.pmd_proyecto;
 
 import android.util.Log;
 
+import com.example.pmd_proyecto.model.EnunciadoProblema;
 import com.example.pmd_proyecto.model.GeminiResponse;
 import com.example.pmd_proyecto.model.Problem;
 import com.example.pmd_proyecto.model.RetoProgramacion;
@@ -186,6 +187,28 @@ public class NetUtils {
             in.close();
             Gson gson = new Gson();
             return Arrays.asList(gson.fromJson(response.toString(), Problem[].class));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static EnunciadoProblema ConsultarEnunciado(String id){
+        try {
+            URL url = new URL("https://leetcode-api-pied.vercel.app/problem/"+id);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            // Leer la respuesta
+            StringBuilder response = new StringBuilder();
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            Gson gson = new Gson();
+            return gson.fromJson(response.toString(), EnunciadoProblema.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
