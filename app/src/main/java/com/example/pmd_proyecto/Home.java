@@ -1,5 +1,6 @@
 package com.example.pmd_proyecto;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -34,16 +35,22 @@ public class Home extends AppCompatActivity {
         problemasF = new ProblemasFragment();
         yoF = new YoFragment();
 
+        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+        boolean fromLogin = prefs.getBoolean("from_login", false);
+
         // Añadir todas una vez, mostrando solo Home
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragmentContainerView, yoF, "YO").hide(yoF)
-                .add(R.id.fragmentContainerView, problemasF, "PROB").hide(problemasF)
-                .add(R.id.fragmentContainerView, retosF, "RETOS").hide(retosF)
                 .add(R.id.fragmentContainerView, homeF, "HOME")
+                .add(R.id.fragmentContainerView, yoF, "YO")
+                .add(R.id.fragmentContainerView, problemasF, "PROB")
+                .add(R.id.fragmentContainerView, retosF, "RETOS")
+                .hide(fromLogin ? homeF : yoF)
+                .hide(problemasF)
+                .hide(retosF)
                 .commit();
 
-        active = homeF;
+        active = fromLogin ? yoF : homeF;
 
         bottomNav.setOnItemSelectedListener(item -> {
             Fragment target;
@@ -63,24 +70,14 @@ public class Home extends AppCompatActivity {
             return true;
         });
 //        Fragmento nicial
-        bottomNav.setSelectedItemId(R.id.nav_home);
+        bottomNav.setSelectedItemId(
+                fromLogin ? R.id.nav_yo : R.id.nav_home
+        );
+        prefs.edit().putBoolean("from_login", false).apply();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        boolean logged = getSharedPreferences("session", MODE_PRIVATE)
-                .getBoolean("logged", false);
-
-        Fragment actual = getSupportFragmentManager()
-                .findFragmentById(R.id.fragmentContainerView);
-
-        if (logged && actual instanceof YoFragment) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainerView, new YoFragment())
-                    .commit();
-        }
     }
 }

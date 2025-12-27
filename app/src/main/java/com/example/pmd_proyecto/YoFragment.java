@@ -176,13 +176,15 @@ public class YoFragment extends Fragment {
         }
 
         view.findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> {
-            prefs.edit().clear().apply();
 
-            requireActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainerView, new YoFragment())
-                    .commit();
+            prefs.edit()
+                    .putBoolean("logged", false)
+                    .remove("email")
+                    .apply();
+
+            Intent intent = new Intent(requireActivity(), Home.class);
+            startActivity(intent);
+            requireActivity().finish();
         });
 
         return view;

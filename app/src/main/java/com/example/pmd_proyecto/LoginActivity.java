@@ -59,8 +59,12 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
         prefs.edit()
                 .putBoolean("logged", true)
+                .putBoolean("from_login", true)
                 .putString("email", email)
-                .apply();
+                .commit();
+        Intent intent = new Intent(LoginActivity.this, Home.class);
+        startActivity(intent);
+        finish();
     }
 
     private void abrirRegistro() {
