@@ -67,17 +67,7 @@ public class HomeFragment extends Fragment {
         View btnStart = view.findViewById(R.id.btnStart);
 
         btnStart.setOnClickListener(v -> {
-            requireActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainerView, new RetosFragment())
-                    .addToBackStack(null)
-                    .commit();
-
-            // Actualizar el menú inferior
-            BottomNavigationView bottomNav =
-                    requireActivity().findViewById(R.id.menu);
-
+            BottomNavigationView bottomNav = requireActivity().findViewById(R.id.menu);
             bottomNav.setSelectedItemId(R.id.nav_retos);
         });
 
