@@ -1,6 +1,7 @@
 package com.example.pmd_proyecto;
 
 import android.app.Activity;
+import android.app.Notification; // Import necesario
 import android.content.Context;
 import android.util.Log;
 
@@ -37,14 +38,34 @@ public class GenerarRetoThread implements Runnable {
             });
 
             // Logica de relleno en segundo plano
-            int retosDisponibles = db.contarRetosDisponibles();
-            if (retosDisponibles < 6) {
-                RetoProgramacion nuevoReto = NetUtils.generarReto();
+            int cantidadActual = db.contarRetosDisponibles();
+            int nuevosDescargados = 0;
 
-                // Solo guardamos si el reto es valido
-                if (nuevoReto != null && nuevoReto.pregunta != null) {
-                    db.guardarReto(nuevoReto);
+            // Solo nos ponemos a trabajar si el stock baja de 5 (el disparador)
+            // Pero si trabajamos, rellenamos hasta 10 (el objetivo)
+            if (cantidadActual < 5) {
+
+                while (db.contarRetosDisponibles() < 10) {
+                    RetoProgramacion nuevoReto = NetUtils.generarReto();
+
+                    if (nuevoReto != null && nuevoReto.pregunta != null) {
+                        db.guardarReto(nuevoReto);
+                        nuevosDescargados++;
+                    } else {
+                        break;
+                    }
                 }
+            }
+
+            //Si se han descargado retos nuevos, lanzamos la notificación
+            if (nuevosDescargados > 0) {
+                NotificationHandler handler = new NotificationHandler(ctx);
+                Notification.Builder nb = handler.createNotification(
+                        "Stock recargado",
+                        "Hemos añadido " + nuevosDescargados + " nuevos retos para ti."
+                );
+                // ID 1 para la notificación
+                handler.getManager().notify(1, nb.build());
             }
 
         } catch (Exception e) {

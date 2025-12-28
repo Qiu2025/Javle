@@ -1,5 +1,6 @@
 package com.example.pmd_proyecto;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,11 @@ import io.github.kbiakov.codeview.CodeView;
 import io.github.kbiakov.codeview.classifier.CodeProcessor;
 import io.github.kbiakov.codeview.highlight.ColorTheme;
 
+//Para la alarma
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import java.util.Calendar;
+
 public class RetosActivity extends AppCompatActivity {
     private Button btn;
     private TextView txtTema;
@@ -36,6 +42,15 @@ public class RetosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_retos);
+
+        /*Notificaiones*/
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+        programarNotificacionDiaria();
 
         SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
         emailUsuario = prefs.getString("email", null);
@@ -75,6 +90,7 @@ public class RetosActivity extends AppCompatActivity {
         btnOpt4.setOnClickListener(v -> comprobarRespuesta("D", v, retoActual));
 
         resetearBotones();
+
     }
 
     public void mostrarReto(RetoProgramacion reto) {
@@ -147,4 +163,57 @@ public class RetosActivity extends AppCompatActivity {
         btnOpt3.setEnabled(false);
         btnOpt4.setEnabled(false);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 101 && grantResults.length > 0) {
+            if (grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                // Permiso concedido
+            }
+        }
+    }
+
+
+    private void programarNotificacionDiaria() {
+        // Configuramos la nueva hora Y
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 18); // Ejemplo: 18:00
+        calendar.set(Calendar.MINUTE, 10);
+        calendar.set(Calendar.SECOND, 0);
+
+        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        // Creamos el PendingIntent 
+        Intent intent = new Intent(getApplicationContext(), AlertReceiver.class);
+
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            flags |= PendingIntent.FLAG_IMMUTABLE;
+        }
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 100, intent, flags);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        if (alarmManager != null) {
+            // Cancelamos cualquier alarma previa que tuviera este mismo PendingIntent (ID 100)
+            // Así borramos la "hora X" antes de poner la "hora Y".
+            alarmManager.cancel(pendingIntent);
+
+            // 3. Establecemos la nueva alarma
+            alarmManager.setRepeating(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY,
+                    pendingIntent
+            );
+        }
+    }
+
+
+
+
 }
