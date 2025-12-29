@@ -44,14 +44,15 @@ public class ProblemAdapter extends BaseAdapter {
 
         Problem p = datos.get(i);
 
+        String id = "ID " + p.id;
         ((TextView) convertView.findViewById(R.id.tvId))
-                .setText("ID " + p.getId());
+                .setText(id);
 
         ((TextView) convertView.findViewById(R.id.tvTitle))
-                .setText(p.getTitle());
+                .setText(p.title);
 
         ((TextView) convertView.findViewById(R.id.tvDifficulty))
-                .setText(p.getDifficulty());
+                .setText(p.difficulty);
 
         return convertView;
     }
