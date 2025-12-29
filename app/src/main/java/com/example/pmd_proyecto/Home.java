@@ -25,6 +25,20 @@ public class Home extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // --- LÓGICA DE SESIÓN  ---
+        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+        boolean isLogged = prefs.getBoolean("logged", false);
+        boolean remember = prefs.getBoolean("remember", false);
+        boolean fromLogin = prefs.getBoolean("from_login", false);
+
+        // Si no marcó "Recordar" y no viene directamente del login (es un reinicio de app)
+        if (isLogged && !remember && !fromLogin) {
+            prefs.edit().clear().apply();
+            isLogged = false;
+        }
+        // ---------------------------------------
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -40,9 +54,6 @@ public class Home extends AppCompatActivity {
         retosF = new RetosFragment();
         problemasF = new ProblemasFragment();
         yoF = new YoFragment();
-
-        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
-        boolean fromLogin = prefs.getBoolean("from_login", false);
 
         // Añadir todas una vez, mostrando solo Home
         getSupportFragmentManager()
@@ -78,6 +89,8 @@ public class Home extends AppCompatActivity {
 
         // Fragmento inicial
         bottomNav.setSelectedItemId(fromLogin ? R.id.nav_yo : R.id.nav_home);
+
+        // Reseteamos el flag de login para la siguiente vez
         prefs.edit().putBoolean("from_login", false).apply();
 
         // Notificaciones

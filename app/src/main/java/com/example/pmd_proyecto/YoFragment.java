@@ -133,11 +133,11 @@ public class YoFragment extends Fragment {
         view.findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> {
 
             prefs.edit()
-                    .putBoolean("logged", false)
-                    .remove("email")
+                    .clear()
                     .apply();
 
             Intent intent = new Intent(requireActivity(), Home.class);
+            // Reinicia el Home para que detecte que ya no hay usuario
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             requireActivity().finish();

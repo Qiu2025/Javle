@@ -1,9 +1,11 @@
 package com.example.pmd_proyecto;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,21 +14,33 @@ public class RegisterActivity extends AppCompatActivity {
 
     EditText etEmail, etPassword;
     Button btnRegister;
+    TextView tvLoginAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_register); // El nuevo XML con título "Crear cuenta"
 
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
-        btnRegister = findViewById(R.id.btnLogin); // reutilizas el botón
+        btnRegister = findViewById(R.id.btnRegister);
+        tvLoginAccount = findViewById(R.id.tvLoginAccount);
 
-        btnRegister.setText("Crear cuenta");
-        btnRegister.setOnClickListener(v -> registrar());
+        // Al pulsar "Registrarse"
+        btnRegister.setOnClickListener(v -> hacerRegistro());
+
+        // Al pulsar "¿Tienes cuenta? Inicia sesión"
+        tvLoginAccount.setOnClickListener(v -> {
+            // Abrimos el Login explícitamente
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+
+            // Cerramos esta pantalla de registro para que no quede en el "historial" atrás
+            finish();
+        });
     }
 
-    private void registrar() {
+    private void hacerRegistro() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
@@ -35,13 +49,13 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        boolean ok = UsuarioDAO.registrar(this, email, password);
-
-        if (ok) {
-            guardarSesion(email);
-            finish(); // vuelve al fragmento Yo
+        // Usamos tu UsuarioDAO existente
+        boolean exito = UsuarioDAO.registrar(this, email, password);
+        if (exito) {
+            Toast.makeText(this, "Cuenta creada, inicia sesión", Toast.LENGTH_SHORT).show();
+            finish();
         } else {
-            Toast.makeText(this, "Ese email ya existe", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error: El usuario ya existe o hubo un fallo", Toast.LENGTH_SHORT).show();
         }
     }
 
