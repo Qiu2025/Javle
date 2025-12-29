@@ -54,16 +54,16 @@ public class RetosActivity extends AppCompatActivity {
         });
 
         btnOpt1 = findViewById(R.id.retos_button_opt1);
-        btnOpt1.setOnClickListener(v -> comprobarRespuesta("A", v, retoActual));
+        configurarBoton(btnOpt1, "A");
 
         btnOpt2 = findViewById(R.id.retos_button_opt2);
-        btnOpt2.setOnClickListener(v -> comprobarRespuesta("B", v, retoActual));
+        configurarBoton(btnOpt2, "B");
 
         btnOpt3 = findViewById(R.id.retos_button_opt3);
-        btnOpt3.setOnClickListener(v -> comprobarRespuesta("C", v, retoActual));
+        configurarBoton(btnOpt3, "C");
 
         btnOpt4 = findViewById(R.id.retos_button_opt4);
-        btnOpt4.setOnClickListener(v -> comprobarRespuesta("D", v, retoActual));
+        configurarBoton(btnOpt4, "D");
 
         // Textos
         tvTema = findViewById(R.id.retos_textview_tema);
@@ -73,8 +73,6 @@ public class RetosActivity extends AppCompatActivity {
         // Carga automatica del primer reto
         MostrarRetoThread task = new MostrarRetoThread(RetosActivity.this);
         new Thread(task).start();
-
-        resetearBotones();
     }
 
     public void mostrarReto(RetoProgramacion reto) {
@@ -112,6 +110,13 @@ public class RetosActivity extends AppCompatActivity {
         }
     }
 
+    private void configurarBoton(Button btn, String letra) {
+        btn.setOnClickListener(v -> {
+            String texto = ((Button) v).getText().toString().toUpperCase().trim();
+            comprobarRespuesta(v, letra, texto, retoActual);
+        });
+    }
+
     private void resetearBotones() {
         Button[] botones = {btnOpt1, btnOpt2, btnOpt3, btnOpt4};
         for (Button b : botones) {
@@ -120,12 +125,13 @@ public class RetosActivity extends AppCompatActivity {
         }
     }
 
-    private void comprobarRespuesta(String letraSeleccionada, View botonPulsado, RetoProgramacion reto) {
+    private void comprobarRespuesta(View botonPulsado, String letra, String texto, RetoProgramacion reto) {
         if (reto == null) return;
 
         DBHelper dbHelper = DBHelper.getInstance(this);
 
-        if (letraSeleccionada.equals(reto.respuestaCorrecta)) {
+        String respuestaCorrecta = reto.respuestaCorrecta.toUpperCase().trim();
+        if (letra.equals(respuestaCorrecta) || texto.equals(respuestaCorrecta)) {
             botonPulsado.setBackgroundColor(getColor(android.R.color.holo_green_light));
             Toast.makeText(this, "Correcto!", Toast.LENGTH_SHORT).show();
 

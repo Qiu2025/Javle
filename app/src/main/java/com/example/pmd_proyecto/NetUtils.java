@@ -141,6 +141,7 @@ public class NetUtils {
             }
         }
 
+        Log.d("NetUtils", "Respuesta de la IA: " + respuesta.toString());
         return respuesta.toString();
     }
 
