@@ -7,6 +7,7 @@
     android:background="#F5F5F5"
     android:orientation="vertical">
 
+
     <ScrollView
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
@@ -20,13 +21,14 @@
             android:orientation="vertical"
             android:paddingBottom="20dp">
 
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="140dp"
                 android:background="@drawable/rounded_header"
+                android:minHeight="150dp"
                 android:orientation="vertical"
-                android:paddingTop="24dp"
+                android:paddingTop="50dp"
                 android:paddingBottom="30dp">
 
                 <TextView
@@ -85,6 +87,7 @@
                 android:minHeight="60dp"
                 android:text="Opción 1"
                 android:textColor="@android:color/black"
+                app:cornerRadius="16dp"
                 app:backgroundTint="@android:color/white"
                 app:strokeColor="#BDBDBD"
                 app:strokeWidth="1dp" />
@@ -99,6 +102,7 @@
                 android:minHeight="60dp"
                 android:text="Opción 2"
                 android:textColor="@android:color/black"
+                app:cornerRadius="16dp"
                 app:backgroundTint="@android:color/white"
                 app:strokeColor="#BDBDBD"
                 app:strokeWidth="1dp" />
@@ -113,6 +117,7 @@
                 android:minHeight="60dp"
                 android:text="Opción 3"
                 android:textColor="@android:color/black"
+                app:cornerRadius="16dp"
                 app:backgroundTint="@android:color/white"
                 app:strokeColor="#BDBDBD"
                 app:strokeWidth="1dp" />
@@ -126,6 +131,7 @@
                 android:minHeight="60dp"
                 android:text="Opción 4"
                 android:textColor="@android:color/black"
+                app:cornerRadius="16dp"
                 app:backgroundTint="@android:color/white"
                 app:strokeColor="#BDBDBD"
                 app:strokeWidth="1dp" />
@@ -133,15 +139,14 @@
         </LinearLayout>
     </ScrollView>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/retos_button_siguiente"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:backgroundTint="#5C6BC0"
+        android:backgroundTint="#4F46E5"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="SIGUIENTE"
-        android:textColor="@android:color/white"
         android:textSize="16sp"
         android:textStyle="bold"
         app:cornerRadius="0dp" />

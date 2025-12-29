@@ -105,7 +105,7 @@ public class EnunciadoActivity extends AppCompatActivity {
                 hintIndex++;
                 String hintsString = "Hints: " + (hints.size()-hintIndex);
                 hintsTitulo.setText(hintsString);
-                if(hintIndex==hints.size()) btnHint.setEnabled(false);
+                if(hintIndex == hints.size()) btnHint.setEnabled(false);
             }
         });
 

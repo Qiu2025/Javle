@@ -5,16 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingStart="20dp"
-    android:paddingEnd="20dp"
-    android:paddingTop="20dp">
+    android:paddingEnd="20dp">
 
     <TextView
         android:id="@+id/fretos_textview_titulo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Tu Progreso"
         android:textSize="24sp"
         android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,8 +35,7 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="0dp">
+            app:cardElevation="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -67,8 +67,7 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="0dp">
+            app:cardElevation="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -95,16 +94,19 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/fretos_btn_empezar"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
-        android:text="EMPEZAR"
+        android:layout_marginEnd="32dp"
+        android:text="Empezar"
+        android:textColor="@color/white"
         android:textSize="18sp"
-        android:textStyle="bold"
-        app:backgroundTint="#5C6BC0"
-        app:icon="@android:drawable/ic_media_play"
+        app:backgroundTint="#4F46E5"
+        app:cornerRadius="16dp"
+        app:icon="@drawable/play_arrow"
         app:iconGravity="textStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -116,9 +118,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="Más opciones"
+        android:textColor="#1A1A1A"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="#1A1A1A"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fretos_btn_empezar" />
 
@@ -129,11 +131,25 @@
         android:layout_height="65dp"
         android:layout_marginTop="12dp"
         android:gravity="start|center_vertical"
-        android:text="Historial de errores"
         android:paddingStart="20dp"
+        android:text="Historial de errores"
         app:icon="@android:drawable/ic_menu_recent_history"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_title_history" />
+
+    <TextView
+        android:id="@+id/tv_login_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="* Solo se guarda el progreso de cuentas con sesión iniciada."
+        android:textColor="#757575"
+        android:textSize="12sp"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_history_failures" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

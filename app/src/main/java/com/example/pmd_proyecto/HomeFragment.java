@@ -23,7 +23,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         // Referencia al botón
-        View btnStart = view.findViewById(R.id.btnStart);
+        View btnStart = view.findViewById(R.id.btn_empezarReto);
 
         btnStart.setOnClickListener(v -> {
             BottomNavigationView bottomNav = requireActivity().findViewById(R.id.menu);

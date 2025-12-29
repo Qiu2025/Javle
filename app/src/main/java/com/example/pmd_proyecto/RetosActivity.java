@@ -1,6 +1,8 @@
 package com.example.pmd_proyecto;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -35,7 +37,7 @@ public class RetosActivity extends AppCompatActivity {
         setContentView(R.layout.activity_retos);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
             return insets;
         });
 
@@ -121,7 +123,7 @@ public class RetosActivity extends AppCompatActivity {
         Button[] botones = {btnOpt1, btnOpt2, btnOpt3, btnOpt4};
         for (Button b : botones) {
             b.setEnabled(true);
-            b.setBackgroundResource(android.R.drawable.btn_default);
+            b.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
         }
     }
 
@@ -132,12 +134,12 @@ public class RetosActivity extends AppCompatActivity {
 
         String respuestaCorrecta = reto.respuestaCorrecta.toUpperCase().trim();
         if (letra.equals(respuestaCorrecta) || texto.equals(respuestaCorrecta)) {
-            botonPulsado.setBackgroundColor(getColor(android.R.color.holo_green_light));
+            botonPulsado.setBackgroundTintList(ColorStateList.valueOf(getColor(android.R.color.holo_green_light)));
             Toast.makeText(this, "Correcto!", Toast.LENGTH_SHORT).show();
 
             dbHelper.sumarAcierto(emailUsuario);
         } else {
-            botonPulsado.setBackgroundColor(getColor(android.R.color.holo_red_light));
+            botonPulsado.setBackgroundTintList(ColorStateList.valueOf(getColor(android.R.color.holo_red_light)));
             Toast.makeText(this, "Incorrecto!", Toast.LENGTH_SHORT).show();
 
             dbHelper.sumarFallo(emailUsuario);

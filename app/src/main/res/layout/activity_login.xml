@@ -50,22 +50,23 @@
         android:id="@+id/cbRememberMe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="6dp"
         android:text="Mantener sesión iniciada"
         app:layout_constraintEnd_toStartOf="@+id/tvCreateAccount"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
 
     <Button
         android:id="@+id/btnLogin"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="32dp"
         android:text="Entrar"
         android:textSize="18sp"
+        app:backgroundTint="#4F46E5"
+        app:cornerRadius="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etPassword" />
 
@@ -75,7 +76,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Crear cuenta"
-        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textColor="#2196F3"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"

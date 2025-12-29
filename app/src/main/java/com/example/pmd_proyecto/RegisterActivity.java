@@ -19,21 +19,17 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register); // El nuevo XML con título "Crear cuenta"
+        setContentView(R.layout.activity_register);
 
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnRegister = findViewById(R.id.btnRegister);
         tvLoginAccount = findViewById(R.id.tvLoginAccount);
 
-        // Al pulsar "Registrarse"
         btnRegister.setOnClickListener(v -> hacerRegistro());
 
-        // Al pulsar "¿Tienes cuenta? Inicia sesión"
         tvLoginAccount.setOnClickListener(v -> {
             Intent intent = new Intent(this, LoginActivity.class);
-            // Si LoginActivity ya estaba abierta, vuelve a ella.
-            // Si NO estaba abierta (porque viniste directo desde "Yo"), la abre nueva.
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
             startActivity(intent);
