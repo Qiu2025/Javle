@@ -31,12 +31,12 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Al pulsar "¿Tienes cuenta? Inicia sesión"
         tvLoginAccount.setOnClickListener(v -> {
-            // Abrimos el Login explícitamente
             Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
+            // Si LoginActivity ya estaba abierta, vuelve a ella.
+            // Si NO estaba abierta (porque viniste directo desde "Yo"), la abre nueva.
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-            // Cerramos esta pantalla de registro para que no quede en el "historial" atrás
-            finish();
+            startActivity(intent);
         });
     }
 

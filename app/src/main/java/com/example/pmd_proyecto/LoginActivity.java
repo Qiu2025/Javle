@@ -31,7 +31,13 @@ public class LoginActivity extends AppCompatActivity {
 
         tvCreateAccount.setOnClickListener(v -> {
             Intent intent = new Intent(this, RegisterActivity.class);
+
+            // Si esta abierto el registro de antes, lo traemos al frente en lugar de crear otro
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
             startActivity(intent);
+            // IMPORTANTE: Aquí NO pongas finish() para que el Login siga existiendo
+            // y sea rápido volver a él.
         });
     }
 
