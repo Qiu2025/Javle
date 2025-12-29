@@ -1,7 +1,11 @@
 package com.example.pmd_proyecto;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +15,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.Calendar;
 
 public class Home extends AppCompatActivity {
     private Fragment homeF, retosF, problemasF, yoF;
@@ -71,15 +77,69 @@ public class Home extends AppCompatActivity {
         });
 
         // Fragmento inicial
-        bottomNav.setSelectedItemId(
-                fromLogin ? R.id.nav_yo : R.id.nav_home
-        );
+        bottomNav.setSelectedItemId(fromLogin ? R.id.nav_yo : R.id.nav_home);
         prefs.edit().putBoolean("from_login", false).apply();
+
+        // Notificaciones
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
 
         // Carga de retos inicial automatica
         new Thread(() -> {
-            DBHelper db = new DBHelper(Home.this);
-            db.reabastecerRetos();
+            DBHelper.getInstance(Home.this).reabastecerRetos();
         }).start();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 101 && grantResults.length > 0) {
+            if (grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Notificaciones activadas", Toast.LENGTH_SHORT).show();
+                programarNotificacionDiaria();
+            } else {
+                Toast.makeText(this, "No recibiras avisos para practicar", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void programarNotificacionDiaria() {
+        // Configurando la hora
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 10);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        // Creamos el PendingIntent
+        Intent intent = new Intent(getApplicationContext(), AlertReceiver.class);
+
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            flags |= PendingIntent.FLAG_IMMUTABLE;
+        }
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 100, intent, flags);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        if (alarmManager != null) {
+            // Cancelamos cualquier alarma previa que tuviera este mismo PendingIntent
+            alarmManager.cancel(pendingIntent);
+
+            // Establecemos la nueva alarma
+            alarmManager.setRepeating(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY,
+                    pendingIntent
+            );
+        }
     }
 }

@@ -8,13 +8,13 @@ import com.example.pmd_proyecto.model.RetoProgramacion;
 
 import java.util.List;
 
-public class GenerarRetoThread implements Runnable {
+public class MostrarRetoThread implements Runnable {
     private Context ctx;
     private DBHelper db;
 
-    public GenerarRetoThread(Context ctx) {
+    public MostrarRetoThread(Context ctx) {
         this.ctx = ctx;
-        db = new DBHelper(ctx);
+        db = DBHelper.getInstance(ctx);
     }
 
     @Override
@@ -65,8 +65,6 @@ public class GenerarRetoThread implements Runnable {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            db.close();
         }
     }
 }

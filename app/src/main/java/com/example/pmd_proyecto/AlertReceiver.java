@@ -6,9 +6,10 @@ import android.content.Intent;
 import android.app.Notification;
 
 public class AlertReceiver extends BroadcastReceiver {
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        // Usamos NotificationHandler para lanzar la notificación
+        // Usamos NotificationHandler para lanzar la notificacion
         NotificationHandler handler = new NotificationHandler(context);
 
         Notification.Builder nb = handler.createNotification(

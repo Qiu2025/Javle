@@ -30,7 +30,7 @@
                 android:paddingBottom="30dp">
 
                 <TextView
-                    android:id="@+id/main_textview_tema"
+                    android:id="@+id/retos_textview_tema"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="24dp"
@@ -41,7 +41,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/main_textview_pregunta"
+                    android:id="@+id/retos_textview_pregunta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
@@ -54,7 +54,7 @@
             </LinearLayout>
 
             <HorizontalScrollView
-                android:id="@+id/code_scroll_container"
+                android:id="@+id/horizontal_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
@@ -64,7 +64,7 @@
                 android:scrollbars="horizontal">
 
                 <TextView
-                    android:id="@+id/main_code_view"
+                    android:id="@+id/retos_textview_code"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
@@ -75,7 +75,7 @@
             </HorizontalScrollView>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/main_button_opt1"
+                android:id="@+id/retos_button_opt1"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
                 app:strokeWidth="1dp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/main_button_opt2"
+                android:id="@+id/retos_button_opt2"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
                 app:strokeWidth="1dp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/main_button_opt3"
+                android:id="@+id/retos_button_opt3"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -118,7 +118,7 @@
                 app:strokeWidth="1dp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/main_button_opt4"
+                android:id="@+id/retos_button_opt4"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -134,7 +134,7 @@
     </ScrollView>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/main_button_generar"
+        android:id="@+id/retos_button_siguiente"
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:backgroundTint="#5C6BC0"

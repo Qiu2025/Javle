@@ -12,7 +12,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     EditText etEmail, etPassword;
     Button btnRegister;
-    UsuarioDAO usuarioDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,9 +23,6 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnLogin); // reutilizas el botón
 
         btnRegister.setText("Crear cuenta");
-
-        usuarioDAO = new UsuarioDAO(this);
-
         btnRegister.setOnClickListener(v -> registrar());
     }
 
@@ -39,7 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        boolean ok = usuarioDAO.registrar(email, password);
+        boolean ok = UsuarioDAO.registrar(this, email, password);
 
         if (ok) {
             guardarSesion(email);

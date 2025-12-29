@@ -18,12 +18,9 @@ import java.util.List;
 
 public class ErroresFragment extends Fragment {
 
-    @Nullable
     @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater,
-            @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_errores, container, false);
         TextView tvErrores = view.findViewById(R.id.tvErrores);
@@ -32,8 +29,7 @@ public class ErroresFragment extends Fragment {
                 requireContext().getSharedPreferences("session", Context.MODE_PRIVATE);
         String email = prefs.getString("email", null);
 
-        DBHelper dbHelper = new DBHelper(requireContext());
-        List<ErrorReto> errores = dbHelper.obtenerErrores(email);
+        List<ErrorReto> errores = DBHelper.getInstance(requireContext()).obtenerErrores(email);
 
         if (errores.isEmpty()) {
             tvErrores.setText("No hay errores registrados.");

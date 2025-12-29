@@ -5,9 +5,10 @@ import android.content.Context;
 
 import com.example.pmd_proyecto.model.EnunciadoProblema;
 
-public class ConsultarEnunciadoThread implements Runnable{
+public class ConsultarEnunciadoThread implements Runnable {
     Context ctx;
     String id;
+
     public ConsultarEnunciadoThread(Context ctx, String id){
         this.ctx = ctx;
         this.id  = id;
@@ -17,6 +18,7 @@ public class ConsultarEnunciadoThread implements Runnable{
     public void run() {
         try {
             EnunciadoProblema enunciado = NetUtils.ConsultarEnunciado(id);
+
             if (ctx == null) return;
             ((Activity) ctx).runOnUiThread(new Runnable() {
                 @Override

@@ -2,7 +2,6 @@ package com.example.pmd_proyecto;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,12 +23,10 @@ import android.app.PendingIntent;
 import java.util.Calendar;
 
 public class RetosActivity extends AppCompatActivity {
-    private Button btn;
-    private TextView txtTema, codeView;
+    private TextView tvTema, tvPregunta, tvCode;
     private Button btnOpt1, btnOpt2, btnOpt3, btnOpt4;
     private RetoProgramacion retoActual;
     private String emailUsuario;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,71 +39,63 @@ public class RetosActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Notificaiones
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
-            }
-        }
-        programarNotificacionDiaria();
-
+        // Preferencias
         SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
         emailUsuario = prefs.getString("email", null);
 
-        // Carga automatica del primer reto
-        GenerarRetoThread task = new GenerarRetoThread(RetosActivity.this);
-        new Thread(task).start();
-
-        btn = findViewById(R.id.main_button_generar);
-        btn.setOnClickListener(new View.OnClickListener() {
+        // Botones
+        Button btnSiguiente = findViewById(R.id.retos_button_siguiente);
+        btnSiguiente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GenerarRetoThread task = new GenerarRetoThread(RetosActivity.this);
+                MostrarRetoThread task = new MostrarRetoThread(RetosActivity.this);
                 new Thread(task).start();
             }
         });
 
-        txtTema = findViewById(R.id.main_textview_pregunta);
-        codeView = findViewById(R.id.main_code_view);
-        btnOpt1 = findViewById(R.id.main_button_opt1);
-        btnOpt2 = findViewById(R.id.main_button_opt2);
-        btnOpt3 = findViewById(R.id.main_button_opt3);
-        btnOpt4 = findViewById(R.id.main_button_opt4);
-
+        btnOpt1 = findViewById(R.id.retos_button_opt1);
         btnOpt1.setOnClickListener(v -> comprobarRespuesta("A", v, retoActual));
+
+        btnOpt2 = findViewById(R.id.retos_button_opt2);
         btnOpt2.setOnClickListener(v -> comprobarRespuesta("B", v, retoActual));
+
+        btnOpt3 = findViewById(R.id.retos_button_opt3);
         btnOpt3.setOnClickListener(v -> comprobarRespuesta("C", v, retoActual));
+
+        btnOpt4 = findViewById(R.id.retos_button_opt4);
         btnOpt4.setOnClickListener(v -> comprobarRespuesta("D", v, retoActual));
+
+        // Textos
+        tvTema = findViewById(R.id.retos_textview_tema);
+        tvPregunta = findViewById(R.id.retos_textview_pregunta);
+        tvCode = findViewById(R.id.retos_textview_code);
+
+        // Carga automatica del primer reto
+        MostrarRetoThread task = new MostrarRetoThread(RetosActivity.this);
+        new Thread(task).start();
 
         resetearBotones();
     }
 
     public void mostrarReto(RetoProgramacion reto) {
-        // Validación inicial
         if (reto == null) {
-            txtTema.setText("Error: No se pudo cargar el reto.");
+            tvTema.setText("Error: No se pudo cargar el reto.");
             return;
         }
-
-        // Actualizamos referencia
         this.retoActual = reto;
+
+        tvTema.setText(reto.tema);
+        tvPregunta.setText(reto.pregunta);
         resetearBotones();
 
-        txtTema.setText(reto.pregunta);
-
-        // LÓGICA DE CÓDIGO VS TEORÍA
+        // Verificar si es una pregunta teorica o de codigo
         if (reto.codigo == null || reto.codigo.trim().equals("NO_CODE") || reto.codigo.trim().isEmpty()) {
-            // ES TEÓRICA: Ocultamos el CodeView
-            codeView.setVisibility(View.GONE);
+            // Es teorica
+            tvCode.setVisibility(View.GONE);
         } else {
-            // ES PRÁCTICA: Mostramos el CodeView y arreglamos el formato
-            codeView.setVisibility(View.VISIBLE);
-
-            // TRUCO PARA EL FORMATO:
-            // Reemplazamos los "\\n" literales por saltos de línea reales "\n"
-            String codigoFormateado = reto.codigo.replace("\\n", "\n").replace("\\t", "    ");
-
-            codeView.setText(codigoFormateado);
+            // Es practica
+            tvCode.setVisibility(View.VISIBLE);
+            tvCode.setText(reto.codigo);
         }
 
         // Asignar opciones con seguridad
@@ -134,14 +123,13 @@ public class RetosActivity extends AppCompatActivity {
     private void comprobarRespuesta(String letraSeleccionada, View botonPulsado, RetoProgramacion reto) {
         if (reto == null) return;
 
-        DBHelper dbHelper = new DBHelper(this);
+        DBHelper dbHelper = DBHelper.getInstance(this);
 
         if (letraSeleccionada.equals(reto.respuestaCorrecta)) {
             botonPulsado.setBackgroundColor(getColor(android.R.color.holo_green_light));
             Toast.makeText(this, "Correcto!", Toast.LENGTH_SHORT).show();
 
             dbHelper.sumarAcierto(emailUsuario);
-
         } else {
             botonPulsado.setBackgroundColor(getColor(android.R.color.holo_red_light));
             Toast.makeText(this, "Incorrecto!", Toast.LENGTH_SHORT).show();
@@ -155,53 +143,5 @@ public class RetosActivity extends AppCompatActivity {
         btnOpt2.setEnabled(false);
         btnOpt3.setEnabled(false);
         btnOpt4.setEnabled(false);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 101 && grantResults.length > 0) {
-            if (grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                // Permiso concedido
-            }
-        }
-    }
-
-    private void programarNotificacionDiaria() {
-        // Configuramos la nueva hora Y
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 18); // Ejemplo: 18:00
-        calendar.set(Calendar.MINUTE, 10);
-        calendar.set(Calendar.SECOND, 0);
-
-        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
-        }
-
-        // Creamos el PendingIntent 
-        Intent intent = new Intent(getApplicationContext(), AlertReceiver.class);
-
-        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            flags |= PendingIntent.FLAG_IMMUTABLE;
-        }
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 100, intent, flags);
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-        if (alarmManager != null) {
-            // Cancelamos cualquier alarma previa que tuviera este mismo PendingIntent (ID 100)
-            // Así borramos la "hora X" antes de poner la "hora Y".
-            alarmManager.cancel(pendingIntent);
-
-            // 3. Establecemos la nueva alarma
-            alarmManager.setRepeating(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.getTimeInMillis(),
-                    AlarmManager.INTERVAL_DAY,
-                    pendingIntent
-            );
-        }
     }
 }

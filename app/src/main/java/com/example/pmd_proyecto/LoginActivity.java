@@ -10,12 +10,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
-
     EditText etEmail, etPassword;
     Button btnLogin;
-    UsuarioDAO usuarioDAO;
     TextView tvCreateAccount, tvForgotPassword;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +25,9 @@ public class LoginActivity extends AppCompatActivity {
         tvCreateAccount = findViewById(R.id.tvCreateAccount);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
 
-        usuarioDAO = new UsuarioDAO(this);
-
         btnLogin.setOnClickListener(v -> hacerLogin());
         tvCreateAccount.setOnClickListener(v -> abrirRegistro());
     }
-
 
     private void hacerLogin() {
         String email = etEmail.getText().toString().trim();
@@ -44,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        boolean correcto = usuarioDAO.login(email, password);
+        boolean correcto = UsuarioDAO.login(this, email, password);
 
         if (correcto) {
             Toast.makeText(this, "Login correcto", Toast.LENGTH_SHORT).show();
@@ -63,8 +57,7 @@ public class LoginActivity extends AppCompatActivity {
                 .putString("email", email)
                 .apply();
 
-        DBHelper dbHelper = new DBHelper(this);
-        dbHelper.asegurarProgresoUsuario(email);
+        DBHelper.getInstance(this).asegurarProgresoUsuario(email);
 
         Intent intent = new Intent(LoginActivity.this, Home.class);
         startActivity(intent);
@@ -75,7 +68,4 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
     }
-
-
-
 }

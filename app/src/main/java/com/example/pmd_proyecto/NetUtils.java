@@ -52,8 +52,7 @@ public class NetUtils {
         // Concatenando todos los temas en un solo string
         String listaTemas = String.join(", ", TEMAS);
 
-        String prompt =
-                "Actua como un generador de exámenes de certificación Java. " +
+        String prompt = "Actua como un generador de exámenes de certificación Java. " +
                         "Genera un Array JSON con " + DEFAULT_CANTIDAD + " retos de programación.\n" +
                         "TEMAS DISPONIBLES: [" + listaTemas + "].\n\n" +
 
@@ -61,11 +60,12 @@ public class NetUtils {
                         "1. VARIEDAD TOTAL: Elige aleatoriamente de la lista para cada pregunta, y si se repite, no preguntes lo mismo.\n" +
                         "2. Mezcla preguntas teoricas (sin código) y practicas (con código).\n" +
                         "3. FORMATO JSON PURO (Sin Markdown).\n" +
-                        "4. CAMPO 'codigo': Si es teorica escribe \"NO_CODE\". Si es practica, el codigo va AQUI y NUNCA en 'pregunta'. Usa \\n para saltos de línea.\n" +
+                        "4. Campo 'tema': Una linea que indique el tema del reto.\n" +
                         "5. Campo 'pregunta': Solo el enunciado en lenguaje natural.\n\n" +
-                        "6. Campo 'opciones': Solo el texto en lenguaje natural, sin indicaciones de si es A,B,C o D" +
-                        "7. Estructura:\n" +
-                        "   [{ \"pregunta\": \"...\", \"codigo\": \"...\", \"opciones\": [\"A\", \"B\", \"C\", \"D\"], \"respuestaCorrecta\": \"A\" }]";
+                        "6. CAMPO 'codigo': Si es teorica escribe \"NO_CODE\". Si es practica, el codigo va AQUI y NUNCA en 'pregunta'. Usa \\n para saltos de línea.\n" +
+                        "7. Campo 'opciones': Solo el texto en lenguaje natural, sin indicaciones de si es A,B,C o D" +
+                        "8. Estructura:\n" +
+                        "   [{ \"tema\": \"...\", \"pregunta\": \"...\", \"codigo\": \"...\", \"opciones\": [\"A\", \"B\", \"C\", \"D\"], \"respuestaCorrecta\": \"A\" }]";
 
         // Rellenando los campos del objeto
         GeminiRequest.Part part = new GeminiRequest.Part();

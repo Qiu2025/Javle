@@ -7,14 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class UsuarioDAO {
 
-    private DBHelper dbHelper;
-
-    public UsuarioDAO(Context context) {
-        dbHelper = new DBHelper(context);
-    }
-
-    public boolean login(String email, String password) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+    public static boolean login(Context context, String email, String password) {
+        SQLiteDatabase db = DBHelper.getInstance(context).getReadableDatabase();
 
         Cursor c = db.query(
                 "usuarios",
@@ -30,8 +24,8 @@ public class UsuarioDAO {
         return existe;
     }
 
-    public boolean registrar(String email, String password) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+    public static boolean registrar(Context context, String email, String password) {
+        SQLiteDatabase db = DBHelper.getInstance(context).getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put("email", email);
@@ -41,7 +35,5 @@ public class UsuarioDAO {
 
         return result != -1;
     }
-
-
 }
 

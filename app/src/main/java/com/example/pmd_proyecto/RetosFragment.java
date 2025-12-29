@@ -17,7 +17,6 @@ public class RetosFragment extends Fragment {
 
     private TextView tvAciertos, tvFallos;
     private String emailUsuario;
-    private DBHelper dbHelper;
 
     public RetosFragment() {
         // Required empty public constructor
@@ -27,8 +26,6 @@ public class RetosFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_retos, container, false);
-
-        dbHelper = new DBHelper(requireContext());
 
         // Para leer los emails del usuario en sesion
         SharedPreferences prefs =
@@ -62,7 +59,7 @@ public class RetosFragment extends Fragment {
     private void cargarProgreso() {
         if (emailUsuario == null) return;
 
-        int[] progreso = dbHelper.obtenerProgreso(emailUsuario);
+        int[] progreso = DBHelper.getInstance(requireContext()).obtenerProgreso(emailUsuario);
 
         tvAciertos.setText(String.valueOf(progreso[0]));
         tvFallos.setText(String.valueOf(progreso[1]));

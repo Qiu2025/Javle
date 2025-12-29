@@ -14,6 +14,7 @@ import java.util.List;
 public class ProblemAdapter extends BaseAdapter {
     Context ctx;
     List<Problem> datos;
+
     public ProblemAdapter(Context ctx, List<Problem> datos){
         this.ctx = ctx;
         this.datos = datos;

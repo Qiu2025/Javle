@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.os.Build;
 
 public class NotificationHandler extends ContextWrapper {
-
     private NotificationManager manager;
     public static final String CHANNEL_ID = "retos_channel";
     private final String CHANNEL_NAME = "Nuevos Retos";
@@ -24,6 +23,7 @@ public class NotificationHandler extends ContextWrapper {
     public NotificationManager getManager() {
         if (manager == null)
             manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
         return manager;
     }
 

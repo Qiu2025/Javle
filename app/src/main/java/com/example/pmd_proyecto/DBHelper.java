@@ -15,112 +15,102 @@ import java.util.Arrays;
 
 public class DBHelper extends SQLiteOpenHelper {
 
+    public static DBHelper instance;   // unica instancia en la app
     private static final String DB_NAME = "app.db";
-    private static final int DB_VERSION = 10; // Incrementamos versión
+    private static final int DB_VERSION = 11;
 
-    // Tabla Retos
+    // Tablas
+    public static final String TABLE_USUARIOS = "usuarios";
     public static final String TABLE_RETOS = "retos";
+    public static final String TABLE_PROGRESO = "progreso";
+    public static final String TABLE_ERRORES = "errores";
+
+    // Columnas TABLE_RETOS
     public static final String COL_ID = "_id";
+    public static final String COL_TEMA = "tema";
     public static final String COL_PREGUNTA = "pregunta";
     public static final String COL_CODIGO = "codigo";
     public static final String COL_OPCIONES = "opciones"; // Guardado como texto separado
     public static final String COL_RESPUESTA = "respuesta_correcta";
-    public static final String TABLE_PROGRESO = "progreso";
+
+    // Columnas TABLE_
     public static final String COL_EMAIL = "email";
     public static final String COL_ACIERTOS = "aciertos";
     public static final String COL_FALLOS = "fallos";
-
-    public static final String TABLE_ERRORES = "errores";
     public static final String COL_PREGUNTA_ERR = "pregunta";
     public static final String COL_RESPUESTA_ERR = "respuesta_correcta";
     public static final String COL_FECHA = "fecha";
 
-
-    public DBHelper(Context context) {
+    private DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+    }
+
+    public static DBHelper getInstance(Context context) {
+        if (instance == null) {
+            instance = new DBHelper(context);
+        }
+
+        return instance;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         // Tabla usuarios existente
         db.execSQL(
-                "CREATE TABLE usuarios (" +
+                "CREATE TABLE " + TABLE_USUARIOS + "(" +
                         "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "email TEXT UNIQUE, " +
                         "password TEXT, " +
                         "avatar TEXT)"
         );
 
+        // Tabla para almacenar retos generados por Gemini
         db.execSQL(
-                "CREATE TABLE progreso (" +
+                "CREATE TABLE " + TABLE_RETOS + " (" +
+                        COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        COL_TEMA + " TEXT, " +
+                        COL_PREGUNTA + " TEXT, " +
+                        COL_CODIGO + " TEXT, " +
+                        COL_OPCIONES + " TEXT, " +
+                        COL_RESPUESTA + " TEXT)"
+        );
+
+        // Para almacenar aciertos y fallos en retos
+        db.execSQL(
+                "CREATE TABLE " + TABLE_PROGRESO + "(" +
                         "email TEXT PRIMARY KEY, " +
                         "aciertos INTEGER DEFAULT 0, " +
                         "fallos INTEGER DEFAULT 0, " +
                         "FOREIGN KEY(email) REFERENCES usuarios(email))"
         );
 
-
-        // para almacenar errores
+        // Para almacenar retos fallados
         db.execSQL(
-                "CREATE TABLE errores (" +
+                "CREATE TABLE " + TABLE_ERRORES + "(" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "email TEXT, " +
                         "pregunta TEXT, " +
                         "respuesta_correcta TEXT, " +
                         "fecha INTEGER)"
         );
-
-        // Nueva tabla retos
-        crearTablaRetos(db);
-    }
-
-    private void crearTablaRetos(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_RETOS + " (" +
-                COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL_PREGUNTA + " TEXT, " +
-                COL_CODIGO + " TEXT, " +
-                COL_OPCIONES + " TEXT, " +
-                COL_RESPUESTA + " TEXT)"
-        );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 2) {
-            db.execSQL("ALTER TABLE usuarios ADD COLUMN avatar TEXT");
-        }
-        if (oldVersion < 3) {
-            crearTablaRetos(db);
-        }
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USUARIOS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RETOS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROGRESO);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ERRORES);
 
-        if (oldVersion < 9) {
-            db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS progreso (" +
-                            "email TEXT PRIMARY KEY, " +
-                            "aciertos INTEGER DEFAULT 0, " +
-                            "fallos INTEGER DEFAULT 0)"
-            );
-        }
-
-        if (oldVersion < 10) {
-            db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS errores (" +
-                            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                            "email TEXT, " +
-                            "pregunta TEXT, " +
-                            "respuesta_correcta TEXT, " +
-                            "fecha INTEGER)"
-            );
-        }
-
+        onCreate(db);
     }
 
-    // --- MÉTODOS PARA GESTIÓN DE RETOS ---
-
+    // Metodos para gestion de retos
     public void guardarReto(RetoProgramacion reto) {
         if (reto == null || reto.pregunta == null) return;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put(COL_TEMA, reto.tema);
         values.put(COL_PREGUNTA, reto.pregunta);
         values.put(COL_CODIGO, reto.codigo);
         // Convertir lista a string separado por ##
@@ -141,6 +131,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         if (cursor != null && cursor.moveToFirst()) {
             reto = new RetoProgramacion();
+            reto.tema = cursor.getString(cursor.getColumnIndexOrThrow(COL_TEMA));
             reto.pregunta = cursor.getString(cursor.getColumnIndexOrThrow(COL_PREGUNTA));
             reto.codigo = cursor.getString(cursor.getColumnIndexOrThrow(COL_CODIGO));
             reto.respuestaCorrecta = cursor.getString(cursor.getColumnIndexOrThrow(COL_RESPUESTA));

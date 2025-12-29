@@ -27,12 +27,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link YoFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class YoFragment extends Fragment {
 
     private ActivityResultLauncher<String> seleccionarGaleria;
@@ -40,37 +34,8 @@ public class YoFragment extends Fragment {
     private Uri uriFotoCamara;
     private ImageView avatarView;
 
-
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     public YoFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment YoFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static YoFragment newInstance(String param1, String param2) {
-        YoFragment fragment = new YoFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -94,16 +59,7 @@ public class YoFragment extends Fragment {
                     }
                 }
         );
-
-
-
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -158,8 +114,7 @@ public class YoFragment extends Fragment {
                     : email;
             tvNombre.setText(nombre);
 
-            DBHelper dbHelper = new DBHelper(requireContext());
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
+            SQLiteDatabase db = DBHelper.getInstance(requireContext()).getReadableDatabase();
 
             Cursor c = db.rawQuery(
                     "SELECT avatar FROM usuarios WHERE email = ?",
@@ -203,8 +158,7 @@ public class YoFragment extends Fragment {
         String email = prefs.getString("email", null);
         if (email == null) return;
 
-        DBHelper dbHelper = new DBHelper(requireContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = DBHelper.getInstance(requireContext()).getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put("avatar", localUri.toString());
@@ -224,8 +178,6 @@ public class YoFragment extends Fragment {
                 .commit();
     }
 
-
-
     private Uri crearUriFoto() {
         ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.TITLE, "avatar_" + System.currentTimeMillis());
@@ -235,7 +187,6 @@ public class YoFragment extends Fragment {
                 .getContentResolver()
                 .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
     }
-
 
     private void mostrarOpcionesAvatar() {
         new AlertDialog.Builder(requireContext())
@@ -276,9 +227,4 @@ public class YoFragment extends Fragment {
             return null;
         }
     }
-
-
-
-
-
 }

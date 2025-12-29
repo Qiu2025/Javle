@@ -58,8 +58,6 @@ public class EnunciadoActivity extends AppCompatActivity {
             v.getParent().requestDisallowInterceptTouchEvent(true);
             return false;
         });
-
-
     }
 
     public void mostrarEnunciado(EnunciadoProblema enunciado) {
