@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.TextView;
@@ -45,13 +47,17 @@ public class EnunciadoActivity extends AppCompatActivity {
         new Thread(task).start();
 
 
-//        Permitir mover dentro del WebView
+//      No permitir hacer scroll sobre el webview
         wvEnun = findViewById(R.id.wv_enunciado);
-        wvEnun.setOnTouchListener((v, ev) -> {
-            v.getParent().requestDisallowInterceptTouchEvent(true);
-            return false;
+        wvEnun.setOnTouchListener((v, event) -> {
+            return (event.getAction() == MotionEvent.ACTION_MOVE);
         });
 
+        android.webkit.WebSettings ws = wvEnun.getSettings();
+        ws.setLayoutAlgorithm(android.webkit.WebSettings.LayoutAlgorithm.NORMAL);
+        ws.setJavaScriptEnabled(false);
+
+        wvEnun.setLayerType(View.LAYER_TYPE_HARDWARE, null);
     }
 
     public void mostrarEnunciado(EnunciadoProblema enunciado) {
@@ -106,13 +112,12 @@ public class EnunciadoActivity extends AppCompatActivity {
         }
 
         String html = enunciado.content;
-        String wrappedHtml =
-                "<!doctype html><html><head>" +
-                        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>" +
-                        "<style>body{font-family:sans-serif; padding:12px; line-height:1.4;}</style>" +
-                        "</head><body>" +
-                        html +
-                        "</body></html>";
+        String wrappedHtml = "<html><head><style>" +
+                "body { word-wrap: break-word; margin: 0; padding: 8px; font-family: sans-serif; }" +
+                "pre, code { white-space: pre-wrap; word-break: break-all; }" +
+                "img { max-width: 100%; height: auto; }" +
+                "</style></head><body>" + html + "</body></html>";
+
         wvEnun.loadDataWithBaseURL(null, wrappedHtml, "text/html", "UTF-8", null);
 
 //        Botón para abrir en web

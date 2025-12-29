@@ -112,8 +112,12 @@
                 <WebView
                     android:id="@+id/wv_enunciado"
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"
-                    android:overScrollMode="ifContentScrolls" />
+                    android:layout_height="wrap_content"
+                    android:isScrollContainer="false"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    android:scrollbarAlwaysDrawHorizontalTrack="false"
+                    android:scrollbarAlwaysDrawVerticalTrack="false" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
