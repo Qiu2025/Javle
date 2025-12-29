@@ -61,7 +61,7 @@ public class EnunciadoActivity extends AppCompatActivity {
     public void mostrarEnunciado(EnunciadoProblema enunciado) {
 
         if (enunciado == null || enunciado.content == null) {
-            Toast.makeText(this, "Error cargando el enunciado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "El enunciado no está disponible", Toast.LENGTH_SHORT).show();
             ((TextView) findViewById(R.id.tvTitle)).setText("");
             return;
         }
@@ -77,6 +77,18 @@ public class EnunciadoActivity extends AppCompatActivity {
         if (enunciado.hints != null) {
             String hints = "Hints: " + enunciado.hints.size();
             hintsTitulo.setText(hints);
+        }
+
+        TextView tvTags = findViewById(R.id.tvTags);
+        if (enunciado.topicTags != null && !enunciado.topicTags.isEmpty()) {
+            StringBuilder tags = new StringBuilder();
+            for (int i = 0; i < enunciado.topicTags.size(); i++) {
+                if (i > 0) tags.append(" • ");
+                tags.append(enunciado.topicTags.get(i).name);
+            }
+            tvTags.setText(tags.toString());
+        } else {
+            tvTags.setText("");
         }
 
 //        Botón para mostrar siguiente hint
@@ -97,25 +109,13 @@ public class EnunciadoActivity extends AppCompatActivity {
             }
         });
 
-        TextView tvTags = findViewById(R.id.tvTags);
-        if (enunciado.topicTags != null && !enunciado.topicTags.isEmpty()) {
-            StringBuilder tags = new StringBuilder();
-            for (int i = 0; i < enunciado.topicTags.size(); i++) {
-                if (i > 0) tags.append(" • ");
-                tags.append(enunciado.topicTags.get(i).name);
-            }
-            tvTags.setText(tags.toString());
-        } else {
-            tvTags.setText("");
-        }
-
+//        Usar WebView para mostrar el enunciado
         String html = enunciado.content;
         String wrappedHtml = "<html><head><style>" +
                 "body { word-wrap: break-word; margin: 0; padding: 8px; font-family: sans-serif; }" +
                 "pre, code { white-space: pre-wrap; word-break: break-all; }" +
                 "img { max-width: 100%; height: auto; }" +
                 "</style></head><body>" + html + "</body></html>";
-
         wvEnun.loadDataWithBaseURL(null, wrappedHtml, "text/html", "UTF-8", null);
 
 //        Botón para abrir en web

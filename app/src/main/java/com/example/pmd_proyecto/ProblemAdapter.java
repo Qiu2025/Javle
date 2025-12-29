@@ -45,7 +45,7 @@ public class ProblemAdapter extends BaseAdapter {
 
         Problem p = datos.get(i);
 
-        String id = "ID " + p.id;
+        String id = "ID " + p.frontend_id;
         ((TextView) convertView.findViewById(R.id.tvId))
                 .setText(id);
 
