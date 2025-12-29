@@ -1,8 +1,9 @@
 package com.example.pmd_proyecto;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.TextView;
@@ -21,7 +22,6 @@ import java.util.List;
 public class EnunciadoActivity extends AppCompatActivity {
     private int hintIndex = 0;
     private WebView wvEnun;
-    private WebView wvSol;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -45,20 +45,12 @@ public class EnunciadoActivity extends AppCompatActivity {
         new Thread(task).start();
 
 
-//        Permitir mover dentro de los webviews
+//        Permitir mover dentro del WebView
         wvEnun = findViewById(R.id.wv_enunciado);
         wvEnun.setOnTouchListener((v, ev) -> {
             v.getParent().requestDisallowInterceptTouchEvent(true);
             return false;
         });
-
-        wvSol = findViewById(R.id.wv_solution);
-        wvSol.setVisibility(View.GONE); // Ocultar
-        wvSol.setOnTouchListener((v, ev) -> {
-            v.getParent().requestDisallowInterceptTouchEvent(true);
-            return false;
-        });
-
 
     }
 
@@ -101,29 +93,6 @@ public class EnunciadoActivity extends AppCompatActivity {
             }
         });
 
-//        Botón para mostrar solución
-        Button btnSolution = findViewById(R.id.btnSolution);
-        if(enunciado.solution.content==null) btnSolution.setEnabled(false);
-        btnSolution.setOnClickListener(v -> {
-
-            wvSol.setVisibility(View.VISIBLE);
-            String html = "";
-            if (enunciado.solution != null && enunciado.solution.content != null) {
-                html = enunciado.solution.content;
-            }
-            String wrappedHtml =
-                    "<!doctype html><html><head>" +
-                            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>" +
-                            "<style>body{font-family:sans-serif; padding:12px; line-height:1.4;}</style>" +
-                            "</head><body>" +
-                            html +
-                            "</body></html>";
-            wvSol.loadDataWithBaseURL(null, wrappedHtml, "text/html", "UTF-8", null);
-
-            btnSolution.setEnabled(false);
-        });
-
-
         TextView tvTags = findViewById(R.id.tvTags);
         if (enunciado.topicTags != null && !enunciado.topicTags.isEmpty()) {
             StringBuilder tags = new StringBuilder();
@@ -145,5 +114,17 @@ public class EnunciadoActivity extends AppCompatActivity {
                         html +
                         "</body></html>";
         wvEnun.loadDataWithBaseURL(null, wrappedHtml, "text/html", "UTF-8", null);
+
+//        Botón para abrir en web
+        Button btnOpenWeb = findViewById(R.id.btnOpenWeb);
+        btnOpenWeb.setOnClickListener(v -> {
+            String url = enunciado.url;
+            if (url != null && !url.isEmpty()) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            } else {
+                Toast.makeText(this, "No hay enlace disponible", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }
