@@ -165,8 +165,8 @@ public class DBHelper extends SQLiteOpenHelper {
         int cantidadActual = contarRetosDisponibles();
         int nuevosGuardados = 0;
 
-        // Si quedan menos de 5 retos en la BD, pedimos...
-        if (cantidadActual < 5) {
+        // Si quedan menos de 8 retos en la BD, pedimos...
+        if (cantidadActual < 8) {
             // otro lote de 10
             List<RetoProgramacion> loteAdicional = NetUtils.generarLoteRetos();
 
