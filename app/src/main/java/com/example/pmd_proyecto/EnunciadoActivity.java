@@ -49,9 +49,7 @@ public class EnunciadoActivity extends AppCompatActivity {
 
 //      No permitir hacer scroll sobre el webview
         wvEnun = findViewById(R.id.wv_enunciado);
-        wvEnun.setOnTouchListener((v, event) -> {
-            return (event.getAction() == MotionEvent.ACTION_MOVE);
-        });
+        wvEnun.setOnTouchListener((v, event) -> (event.getAction() == MotionEvent.ACTION_MOVE));
 
         android.webkit.WebSettings ws = wvEnun.getSettings();
         ws.setLayoutAlgorithm(android.webkit.WebSettings.LayoutAlgorithm.NORMAL);
@@ -130,6 +128,26 @@ public class EnunciadoActivity extends AppCompatActivity {
                 Toast.makeText(this, "No hay enlace disponible", Toast.LENGTH_SHORT).show();
             }
         });
+
+//        Botón para compartir URL
+        Button btnShareUrl = findViewById(R.id.btnShareUrl);
+        btnShareUrl.setOnClickListener(v -> {
+            String url = enunciado.url;
+
+            if (url == null) {
+                Toast.makeText(this, "No hay URL para compartir", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType("text/plain");
+            i.putExtra(Intent.EXTRA_TEXT, url);
+
+            // Hacer que abra el panel aplicación a compartir
+            Intent shareIntent = Intent.createChooser(i, "Compartir enlace");
+            startActivity(shareIntent);
+        });
+
 
     }
 }

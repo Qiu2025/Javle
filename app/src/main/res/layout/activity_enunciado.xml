@@ -173,14 +173,31 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Open problem in web -->
-        <Button
-            android:id="@+id/btnOpenWeb"
-            android:layout_width="wrap_content"
+        <!-- Open / Share -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:layout_marginTop="4dp"
-            android:text="@string/abrir_en_web" />
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- Open problem in web -->
+            <Button
+                android:id="@+id/btnOpenWeb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/abrir_en_web" />
+
+            <!-- Share url -->
+            <Button
+                android:id="@+id/btnShareUrl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/compartir_url" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
