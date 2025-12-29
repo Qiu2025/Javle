@@ -20,6 +20,8 @@ import android.content.Context;
 import android.widget.TextView;
 
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AlertDialog;
 
 import java.io.File;
@@ -135,6 +137,8 @@ public class YoFragment extends Fragment {
             prefs.edit()
                     .clear()
                     .apply();
+
+            Toast.makeText(requireContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(requireActivity(), Home.class);
             // Reinicia el Home para que detecte que ya no hay usuario
