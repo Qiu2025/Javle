@@ -84,7 +84,7 @@ public class ProblemasFragment extends Fragment {
 
 //    Mostrar los siguientes problemas
     public void mostrarSiguientesProblemas(){
-        for(int i = 0; i<problemas.size() && i<20;i++){
+        for(int i = 0; nMostrados<problemas.size() && i<20;i++){
             problemasMostrados.add(problemas.get(nMostrados));
             nMostrados++;
         }
