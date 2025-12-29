@@ -3,12 +3,7 @@ package com.example.pmd_proyecto;
 import android.app.Activity;
 import android.content.Context;
 
-import androidx.fragment.app.FragmentActivity;
-
 import com.example.pmd_proyecto.model.EnunciadoProblema;
-import com.example.pmd_proyecto.model.Problem;
-
-import java.util.List;
 
 public class ConsultarEnunciadoThread implements Runnable{
     Context ctx;

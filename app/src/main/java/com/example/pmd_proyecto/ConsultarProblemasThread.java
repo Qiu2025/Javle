@@ -1,7 +1,6 @@
 package com.example.pmd_proyecto;
 
 import android.app.Activity;
-import android.content.Context;
 
 import com.example.pmd_proyecto.model.Problem;
 

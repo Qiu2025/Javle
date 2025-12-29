@@ -169,6 +169,25 @@ public class DBHelper extends SQLiteOpenHelper {
         return count;
     }
 
+    // Metodo para cargar nuevos retos
+    public int reabastecerRetos() {
+        int cantidadActual = contarRetosDisponibles();
+        int nuevosGuardados = 0;
+
+        // Si quedan menos de 5 retos en la BD, pedimos...
+        if (cantidadActual < 5) {
+            // otro lote de 10
+            List<RetoProgramacion> loteAdicional = NetUtils.generarLoteRetos();
+
+            for (RetoProgramacion r : loteAdicional) {
+                guardarReto(r);
+                nuevosGuardados++;
+            }
+        }
+
+        return nuevosGuardados;
+    }
+
     public void asegurarProgresoUsuario(String email) {
         if (email == null) return;
 
@@ -278,7 +297,4 @@ public class DBHelper extends SQLiteOpenHelper {
         cursor.close();
         return lista;
     }
-
-
-
 }

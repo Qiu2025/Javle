@@ -136,6 +136,4 @@ public class EnunciadoActivity extends AppCompatActivity {
             tvContent.setText(android.text.Html.fromHtml(html));
         }
     }
-
-
 }

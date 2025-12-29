@@ -69,15 +69,17 @@ public class Home extends AppCompatActivity {
             active = target;
             return true;
         });
-//        Fragmento nicial
+
+        // Fragmento inicial
         bottomNav.setSelectedItemId(
                 fromLogin ? R.id.nav_yo : R.id.nav_home
         );
         prefs.edit().putBoolean("from_login", false).apply();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+        // Carga de retos inicial automatica
+        new Thread(() -> {
+            DBHelper db = new DBHelper(Home.this);
+            db.reabastecerRetos();
+        }).start();
     }
 }

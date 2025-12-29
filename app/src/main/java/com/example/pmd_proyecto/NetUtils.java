@@ -3,175 +3,189 @@ package com.example.pmd_proyecto;
 import android.util.Log;
 
 import com.example.pmd_proyecto.model.EnunciadoProblema;
+import com.example.pmd_proyecto.model.GeminiRequest;
 import com.example.pmd_proyecto.model.GeminiResponse;
 import com.example.pmd_proyecto.model.Problem;
 import com.example.pmd_proyecto.model.RetoProgramacion;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
+// Esta clase contiene metodos para comunicarse con las APIs (Gemini y Leetcode)
 public class NetUtils {
-    private static final String apiKey = BuildConfig.GEMINI_API_KEY;
-    private static final String[] temas = {
-            "Diferencia entre == y .equals()",
-            "Polimorfismo",
-            "Herencia",
-            "Interfaces",
-            "Clases abstractas",
-            "Excepciones",
-            "Modificadores de acceso",
-            "Uso de la palabra clave static",
-            "Paso por valor vs por referencia",
+    private static final int DEFAULT_CANTIDAD = 10;
+    private static final String API_KEY = BuildConfig.GEMINI_API_KEY;
+    private static final int MAX_INTENTOS = 3;
+
+    private static final String[] TEMAS = {
+            "Diferencia entre == y .equals()", "Polimorfismo", "Herencia",
+            "Interfaces", "Clases abstractas", "Excepciones", "Modificadores de acceso",
+            "Uso de la palabra clave static", "Paso por valor vs por referencia",
+            "Preguntas teoricas sobre conceptos basicos de Java", "POO", "Hilos",
+            "Uso de try-catch-finally", "Tamaños de tipos primitivos",
+            "Diferencias entre implementaciones de estructuras de datos",
+            "Complejidades de estructuras de datos",
+            "Valores por defecto de tipos", "Colecciones", "Arrays",
+            "Casting de tipos", "Bucles for/while"
+    };
+    private static final String[] MODELOS = {
+            "gemini-2.5-flash-lite",    // El mas rapido
+            "gemini-3-flash-preview",   // Con limite pero mas rapido que gemma
+            "gemini-2.5-flash",         // Otra opcion
+            // "gemma-3-27b-it"         // ~ Sin limite, pero lento y no permite MimeType Json
     };
 
+    // Devuelve el json a enviar a gemini
     private static String obtenerJsonPrompt() {
-        String temaAzar = temas[(int) (Math.random() * temas.length)];
-        long seed = System.currentTimeMillis();
-        String template = """
-        {
-          "contents": [{
-            "parts": [{
-              "text": "Genera un reto técnico nivel facil en JAVA sobre el tema: %s. Debe ser corto
-                       ID: %d. Responde ÚNICAMENTE con este formato, sin texto extra:
-                       
-                       [PREGUNTA]
-                       ... (Pocas palabras que clasifique el tema del problema)
-                       
-                       [CODIGO]
-                       (maximo 15 lineas, NO TE PASES DE ESTE LIMITE)
-                       
-                       [OPCIONES] (maximo una linea por cada opcion)
-                       [A]...
-                       [B]...
-                       [C]...
-                       [D]...
-                       
-                       [CORRECTA]
-                       (solo la letra correcta, nada extra)"
-            }]
-          }],
-          "generationConfig": {
-            "temperature": 1.0,
-            "topP": 0.95,
-            "maxOutputTokens": 1024
-          }
-        }
-        """;
+        // Concatenando todos los temas en un solo string
+        String listaTemas = String.join(", ", TEMAS);
 
-        return String.format(template, temaAzar, seed);
+        String prompt =
+                "Actua como un generador de exámenes de certificación Java. " +
+                        "Genera un Array JSON con " + DEFAULT_CANTIDAD + " retos de programación.\n" +
+                        "TEMAS DISPONIBLES: [" + listaTemas + "].\n\n" +
+
+                        "REGLAS OBLIGATORIAS:\n" +
+                        "1. VARIEDAD TOTAL: Elige aleatoriamente de la lista para cada pregunta, y si se repite, no preguntes lo mismo.\n" +
+                        "2. Mezcla preguntas teoricas (sin código) y practicas (con código).\n" +
+                        "3. FORMATO JSON PURO (Sin Markdown).\n" +
+                        "4. CAMPO 'codigo': Si es teorica escribe \"NO_CODE\". Si es practica, el codigo va AQUI y NUNCA en 'pregunta'. Usa \\n para saltos de línea.\n" +
+                        "5. Campo 'pregunta': Solo el enunciado en lenguaje natural.\n\n" +
+                        "6. Campo 'opciones': Solo el texto en lenguaje natural, sin indicaciones de si es A,B,C o D" +
+                        "7. Estructura:\n" +
+                        "   [{ \"pregunta\": \"...\", \"codigo\": \"...\", \"opciones\": [\"A\", \"B\", \"C\", \"D\"], \"respuestaCorrecta\": \"A\" }]";
+
+        // Rellenando los campos del objeto
+        GeminiRequest.Part part = new GeminiRequest.Part();
+        part.text = prompt;
+
+        GeminiRequest.Content content = new GeminiRequest.Content();
+        content.parts.add(part);
+
+        GeminiRequest request = new GeminiRequest();
+        request.contents.add(content);
+        request.generationConfig.temperature = 1.0;
+        request.generationConfig.maxOutputTokens = 8192;
+        request.generationConfig.responseMimeType = "application/json";
+
+        // Pasar el objeto a Json
+        return new Gson().toJson(request);
     }
 
-    // Metodo public para generar un reto
-    public static RetoProgramacion generarReto() {
-        return parsearRespuesta(llamarAPIGemini());
-    }
-
-    public static String generarRetoSinParsear() {
-        return llamarAPIGemini();
-    }
-
-    // Envia el prompt a Gemini y devuelve la respuesta json
+    // Envia el prompt a Gemini y devuelve la respuesta json o vacio si error
     private static String llamarAPIGemini() {
-        StringBuilder response = new StringBuilder();
+        StringBuilder respuesta = new StringBuilder();
 
-        try {
-            // Sin limite, pero lento
-            URL url = new URL("https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=" + apiKey);
+        for (int intento = 1; intento <= MAX_INTENTOS; intento++) {
+            try {
+                // Para elegir un modelo especifico
+                //            URL url = new URL("https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=" + API_KEY);
+                //            URL url = new URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + API_KEY);
+                //            URL url = new URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=" + API_KEY);
+                //            URL url = new URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + API_KEY);
 
-            // El mas rapido, a veces no sigue el formato
-//            URL url = new URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + apiKey);
+                // Elegir aleatoriamente
+                String modeloElegido;
+                modeloElegido = MODELOS[(int) (Math.random() * MODELOS.length)];
+                URL url = new URL("https://generativelanguage.googleapis.com/v1beta/models/" + modeloElegido + ":generateContent?key=" + API_KEY);
 
-            // Con limite pero mas rapido que gemma
-//            URL url = new URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=" + apiKey);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
 
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setDoOutput(true);
+                // Enviar prompt
+                OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+                writer.write(obtenerJsonPrompt());
+                writer.flush();
+                writer.close();
 
-            // Enviar prompt
-            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-            writer.write(obtenerJsonPrompt());
-            writer.flush();
-            writer.close();
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) {
+                        respuesta.append(inputLine);
+                    }
+                    in.close();
+                    break;  // si hubo exito no realizamos mas intentos
+                } else {
+                    Log.e("NetUtils", "Error HTTP: " + responseCode);
 
-            // Leer la respuesta
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                    StringBuilder errorMsg = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        errorMsg.append(line);
+                    }
+                    in.close();
+
+                    Log.e("NetUtils", "Respuesta de error de Google: " + errorMsg.toString());
+                    Log.e("NetUtils", "Se va a realizar otro intento a otro modelo...");
+                }
+
+            } catch(Exception e) {
+                e.printStackTrace();
             }
-
-            in.close();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
-        return response.toString();
+        return respuesta.toString();
     }
 
-    // Recibe la respuesta json, la parsea y genera un objeto RetoProgramacion
-    private static RetoProgramacion parsearRespuesta(String respuestaJson) {
+    // Recibe la respuesta json, la parsea y devuelve una lista de RetoProgramacion, o vacio si error
+    private static List<RetoProgramacion> parsearRespuestaLote(String respuestaJson) {
         Gson gson = new Gson();
-        RetoProgramacion reto = new RetoProgramacion();
+        List<RetoProgramacion> lista = new ArrayList<>();
 
         try {
+            if (respuestaJson.isEmpty()) return lista;
+
+            // Respuesta con metadatos
             GeminiResponse objetoFull = gson.fromJson(respuestaJson, GeminiResponse.class);
 
-            // Verificamos que haya candidatos antes de acceder
-            if (objetoFull != null && objetoFull.candidates != null && !objetoFull.candidates.isEmpty()) {
+            if (objetoFull != null && !objetoFull.candidates.isEmpty()) {
+                // Texto literal generado por la IA, es el Json de listado de retos
                 String textoBruto = objetoFull.candidates.get(0).content.parts.get(0).text;
-                Log.d("DEBUG_IA", "Respuesta real de la IA:\n" + textoBruto);
 
-                // Dividimos el texto en cuatro partes usando las etiquetas
-                String[] partes = textoBruto.split("\\[PREGUNTA\\]|\\[CODIGO\\]|\\[OPCIONES\\]|\\[CORRECTA\\]");
-
-                // partes[0] suele estar vacío porque el texto empieza con [PREGUNTA]
-                // partes[1] -> Pregunta
-                // partes[2] -> Código
-                // partes[3] -> Opciones
-                // partes[4] -> Correcta
-
-                if (partes.length >= 5) {
-                    // Pregunta
-                    reto.pregunta = partes[1].trim();
-
-                    // Codigo
-                    String codigo = partes[2].replaceAll("```java|```", "").trim();
-                    reto.codigo = codigo;
-
-                    // Opciones
-                    String bloqueOpciones = partes[3].trim();
-                    String[] arrayOpciones = bloqueOpciones.split("(?=\\[[A-D]\\])");
-                    reto.opciones = new ArrayList<>();
-                    for (String opt : arrayOpciones) {
-                        if (!opt.trim().isEmpty()) reto.opciones.add(opt.trim());
-                    }
-
-                    // Respuesta
-                    reto.respuestaCorrecta = partes[4].trim();
-                } else {
-                    reto.pregunta = "Error: El formato de la IA no fue el esperado.";
-                    Log.e("Parseo", "Texto recibido: " + textoBruto);
+                // Limpieza por si la IA ha metido texto estilo "Claro!, aquí tienes..."
+                int startIndex = textoBruto.indexOf("[");
+                int endIndex = textoBruto.lastIndexOf("]");
+                if (startIndex != -1 && endIndex != -1) {
+                    textoBruto = textoBruto.substring(startIndex, endIndex + 1);
                 }
+
+                // Convertir json a lista de objetos java
+                Type listType = new TypeToken<ArrayList<RetoProgramacion>>(){}.getType();
+                lista = gson.fromJson(textoBruto, listType);
             }
 
         } catch (Exception e) {
-            reto.pregunta = "Error crítico en el parseo.";
-            e.printStackTrace();
+            Log.e("NetUtils", "Error de parseo: " + e.getMessage());
         }
 
-        return reto;
+        return lista;
     }
 
-    public static List<Problem> ConsultarProblemas(){
+    // Metodo publico para obtener DEFAULT_CANTIDAD retos en una llamada. Devuelve lista vacia si error
+    public static List<RetoProgramacion> generarLoteRetos() {
+        return parsearRespuestaLote(llamarAPIGemini());
+    }
+
+    // ----------------------------------------------------------------------------------------- //
+
+    public static List<Problem> ConsultarProblemas() {
         try {
             URL url = new URL("https://leetcode-api-pied.vercel.app/problems");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -193,7 +207,7 @@ public class NetUtils {
         return null;
     }
 
-    public static EnunciadoProblema ConsultarEnunciado(String id){
+    public static EnunciadoProblema ConsultarEnunciado(String id) {
         try {
             URL url = new URL("https://leetcode-api-pied.vercel.app/problem/"+id);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

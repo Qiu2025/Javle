@@ -9,7 +9,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.content.SharedPreferences;
 
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,19 +18,14 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pmd_proyecto.model.RetoProgramacion;
 
-import io.github.kbiakov.codeview.CodeView;
-import io.github.kbiakov.codeview.classifier.CodeProcessor;
-import io.github.kbiakov.codeview.highlight.ColorTheme;
-
-//Para la alarma
+// Para la alarma
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import java.util.Calendar;
 
 public class RetosActivity extends AppCompatActivity {
     private Button btn;
-    private TextView txtTema;
-    private CodeView codeView;
+    private TextView txtTema, codeView;
     private Button btnOpt1, btnOpt2, btnOpt3, btnOpt4;
     private RetoProgramacion retoActual;
     private String emailUsuario;
@@ -42,9 +36,13 @@ public class RetosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_retos);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
-        /*Notificaiones*/
-
+        // Notificaiones
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
@@ -54,15 +52,6 @@ public class RetosActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
         emailUsuario = prefs.getString("email", null);
-
-        Log.d("RETOS", "Usuario en sesión: " + emailUsuario);
-
-        CodeProcessor.init(this);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
         // Carga automatica del primer reto
         GenerarRetoThread task = new GenerarRetoThread(RetosActivity.this);
@@ -77,7 +66,7 @@ public class RetosActivity extends AppCompatActivity {
             }
         });
 
-        txtTema = findViewById(R.id.main_textview_tema);
+        txtTema = findViewById(R.id.main_textview_pregunta);
         codeView = findViewById(R.id.main_code_view);
         btnOpt1 = findViewById(R.id.main_button_opt1);
         btnOpt2 = findViewById(R.id.main_button_opt2);
@@ -90,32 +79,37 @@ public class RetosActivity extends AppCompatActivity {
         btnOpt4.setOnClickListener(v -> comprobarRespuesta("D", v, retoActual));
 
         resetearBotones();
-
     }
 
     public void mostrarReto(RetoProgramacion reto) {
-        // Asignar pregunta
+        // Validación inicial
         if (reto == null) {
-            txtTema.setText("Error: No se pudo generar el reto.");
+            txtTema.setText("Error: No se pudo cargar el reto.");
             return;
         }
 
-        // Actualizar para tener el nuevo reto
+        // Actualizamos referencia
         this.retoActual = reto;
         resetearBotones();
 
         txtTema.setText(reto.pregunta);
 
-        if (reto.codigo != null) {
-            codeView.setOptions(io.github.kbiakov.codeview.adapters.Options.Default.get(this)
-                    .withLanguage("java")
-                    .withTheme(ColorTheme.DEFAULT));
-            codeView.setCode(reto.codigo);
+        // LÓGICA DE CÓDIGO VS TEORÍA
+        if (reto.codigo == null || reto.codigo.trim().equals("NO_CODE") || reto.codigo.trim().isEmpty()) {
+            // ES TEÓRICA: Ocultamos el CodeView
+            codeView.setVisibility(View.GONE);
         } else {
-            codeView.setCode("Error: codigo no encontrado.");
+            // ES PRÁCTICA: Mostramos el CodeView y arreglamos el formato
+            codeView.setVisibility(View.VISIBLE);
+
+            // TRUCO PARA EL FORMATO:
+            // Reemplazamos los "\\n" literales por saltos de línea reales "\n"
+            String codigoFormateado = reto.codigo.replace("\\n", "\n").replace("\\t", "    ");
+
+            codeView.setText(codigoFormateado);
         }
 
-        // Asignar opciones
+        // Asignar opciones con seguridad
         if (reto.opciones == null || reto.opciones.size() < 4) {
             btnOpt1.setText("Error: No se pudo generar las opciones.");
             btnOpt2.setText("Error: No se pudo generar las opciones.");
@@ -136,7 +130,6 @@ public class RetosActivity extends AppCompatActivity {
             b.setBackgroundResource(android.R.drawable.btn_default);
         }
     }
-
 
     private void comprobarRespuesta(String letraSeleccionada, View botonPulsado, RetoProgramacion reto) {
         if (reto == null) return;
@@ -173,7 +166,6 @@ public class RetosActivity extends AppCompatActivity {
             }
         }
     }
-
 
     private void programarNotificacionDiaria() {
         // Configuramos la nueva hora Y
@@ -212,8 +204,4 @@ public class RetosActivity extends AppCompatActivity {
             );
         }
     }
-
-
-
-
 }

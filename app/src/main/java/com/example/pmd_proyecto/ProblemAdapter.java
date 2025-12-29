@@ -55,5 +55,4 @@ public class ProblemAdapter extends BaseAdapter {
 
         return convertView;
     }
-
 }

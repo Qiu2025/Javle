@@ -3,33 +3,46 @@ package com.example.pmd_proyecto;
 import android.app.Activity;
 import android.app.Notification; // Import necesario
 import android.content.Context;
-import android.util.Log;
 
 import com.example.pmd_proyecto.model.RetoProgramacion;
 
+import java.util.List;
+
 public class GenerarRetoThread implements Runnable {
     private Context ctx;
+    private DBHelper db;
 
     public GenerarRetoThread(Context ctx) {
         this.ctx = ctx;
+        db = new DBHelper(ctx);
     }
 
     @Override
     public void run() {
-        DBHelper db = new DBHelper(ctx);
-        RetoProgramacion retoParaMostrar = null;
+        RetoProgramacion retoParaMostrar;
 
         try {
-            // Intentamos sacar de la cache local (Offline mode)
+            // Intentamos obtener uno de la base de datos local
             retoParaMostrar = db.obtenerSiguienteReto();
 
-            // Si no hay nada en base de datos, llamamos a la API (Online mode)
+            // Si es la primera ejecucion o BD vacia
             if (retoParaMostrar == null) {
-                retoParaMostrar = NetUtils.generarReto();
+                // Pedimos 10 de golpe
+                List<RetoProgramacion> loteInicial = NetUtils.generarLoteRetos();
+
+                if (!loteInicial.isEmpty()) {
+                    // El primero lo usamos para mostrarlo ya
+                    retoParaMostrar = loteInicial.get(0);
+                }
+
+                // Guardamos el resto en la BD para el futuro
+                for (int i = 1; i < loteInicial.size(); i++) {
+                    db.guardarReto(loteInicial.get(i));
+                }
             }
 
+            // Lo enviamos a la UI
             final RetoProgramacion finalReto = retoParaMostrar;
-
             ((Activity) ctx).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -37,32 +50,14 @@ public class GenerarRetoThread implements Runnable {
                 }
             });
 
-            // Logica de relleno en segundo plano
-            int cantidadActual = db.contarRetosDisponibles();
-            int nuevosDescargados = 0;
-
-            // Solo nos ponemos a trabajar si el stock baja de 5 (el disparador)
-            // Pero si trabajamos, rellenamos hasta 10 (el objetivo)
-            if (cantidadActual < 5) {
-
-                while (db.contarRetosDisponibles() < 10) {
-                    RetoProgramacion nuevoReto = NetUtils.generarReto();
-
-                    if (nuevoReto != null && nuevoReto.pregunta != null) {
-                        db.guardarReto(nuevoReto);
-                        nuevosDescargados++;
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-            //Si se han descargado retos nuevos, lanzamos la notificación
-            if (nuevosDescargados > 0) {
+            // Logica para cargar nuevos retos en segundo plano
+            int nuevosGuardados = db.reabastecerRetos();
+            // Si se han descargado retos nuevos, lanzamos una notificación
+            if (nuevosGuardados > 0) {
                 NotificationHandler handler = new NotificationHandler(ctx);
                 Notification.Builder nb = handler.createNotification(
                         "Stock recargado",
-                        "Hemos añadido " + nuevosDescargados + " nuevos retos para ti."
+                        "Hemos añadido " + nuevosGuardados + " nuevos retos para ti."
                 );
                 // ID 1 para la notificación
                 handler.getManager().notify(1, nb.build());
