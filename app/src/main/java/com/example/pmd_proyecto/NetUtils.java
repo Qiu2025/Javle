@@ -18,10 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 
 // Esta clase contiene metodos para comunicarse con las APIs (Gemini y Leetcode)
 public class NetUtils {
@@ -229,4 +226,35 @@ public class NetUtils {
         }
         return null;
     }
+
+    private static class DailyProblem {
+        EnunciadoProblema question;
+    }
+    public static EnunciadoProblema ConsultarDailyProblem() {
+        try {
+            URL url = new URL("https://leetcode-api-pied.vercel.app/daily");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            // Leer la respuesta
+            StringBuilder response = new StringBuilder();
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            Gson gson = new Gson();
+            DailyProblem dailyProblem = gson.fromJson(response.toString(), DailyProblem.class);
+
+            if (dailyProblem == null) return null;
+            return dailyProblem.question;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

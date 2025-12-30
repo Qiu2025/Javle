@@ -384,12 +384,12 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void guardarEnunciado(EnunciadoProblema enunciado) {
-        if (enunciado == null || enunciado.questionId == null) return;
+        if (enunciado == null || enunciado.questionFrontendId == null) return;
 
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put("questionId", enunciado.questionId);
+        values.put("questionId", enunciado.questionFrontendId);
         values.put("json", gson.toJson(enunciado));
         values.put("fetched_at", System.currentTimeMillis());
 
