@@ -65,9 +65,11 @@
 
         <ImageView
             android:id="@+id/imgGame"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/clash_royale"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:src="@drawable/clashroyale_llorando"
             android:contentDescription="Icono Reto"
             android:layout_marginEnd="8dp" />
 
@@ -143,12 +145,13 @@
 
         <ImageView
             android:id="@+id/imgGameProblemas"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/clash_royale"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:src="@drawable/clashroyale_enfado"
             android:contentDescription="Icono Problemas"
             android:layout_marginEnd="8dp" />
-
         <TextView
             android:id="@+id/txtTitleProblemas"
             android:layout_width="wrap_content"
