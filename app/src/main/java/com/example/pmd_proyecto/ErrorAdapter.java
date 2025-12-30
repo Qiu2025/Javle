@@ -37,22 +37,15 @@ public class ErrorAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View convertView, ViewGroup parent) {
-        ViewHolder holder;
 
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(ctx);
-            // Asegúrate de que el nombre del XML (R.layout.item_problem_layout) sea correcto
             convertView = inflater.inflate(R.layout.item_historial_fallos, parent, false);
-
-            holder = new ViewHolder();
-            holder.tvTema = convertView.findViewById(R.id.tvId);
-            holder.tvRespuesta = convertView.findViewById(R.id.tvRespuestaCorrecta);
-            holder.tvEnunciado = convertView.findViewById(R.id.tvEnunciado);
-
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
         }
+
+        TextView tvTema = convertView.findViewById(R.id.tvId);
+        TextView tvRespuesta = convertView.findViewById(R.id.tvRespuestaCorrecta);
+        TextView tvEnunciado = convertView.findViewById(R.id.tvEnunciado);
 
         ErrorReto er = datos.get(i);
         if (er != null) {
@@ -60,17 +53,11 @@ public class ErrorAdapter extends BaseAdapter {
             String pregunta = er.pregunta != null ? er.pregunta : "Desconocido";
             String respuesta = er.respuestaCorrecta != null ? er.respuestaCorrecta : "-";
 
-            holder.tvTema.setText("Tema: " + tema);
-            holder.tvEnunciado.setText(pregunta);
-            holder.tvRespuesta.setText("Correcta: " + respuesta);
+            tvTema.setText("Tema: " + tema);
+            tvEnunciado.setText(pregunta);
+            tvRespuesta.setText(respuesta);
         }
 
         return convertView;
-    }
-
-    static class ViewHolder {
-        TextView tvTema;
-        TextView tvRespuesta;
-        TextView tvEnunciado;
     }
 }

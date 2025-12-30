@@ -37,36 +37,7 @@ public class ErroresFragment extends Fragment {
             errores = new ArrayList<>();
         }
 
-        ArrayAdapter<ErrorReto> adapter = new ArrayAdapter<ErrorReto>(
-                requireContext(),
-                R.layout.item_historial_fallos,
-                errores
-        ) {
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View item = convertView;
-
-                if (item == null) {
-                    item = LayoutInflater.from(getContext()).inflate(R.layout.item_historial_fallos, parent, false);
-                }
-
-                ErrorReto errorActual = getItem(position);
-
-                TextView tvTema = item.findViewById(R.id.tvId);
-                TextView tvRespuesta = item.findViewById(R.id.tvRespuestaCorrecta);
-                TextView tvEnunciado = item.findViewById(R.id.tvEnunciado);
-
-                if (errorActual != null) {
-                    tvTema.setText("Tema: " + errorActual.tema);
-                    tvRespuesta.setText("Respuesta: " + errorActual.respuestaCorrecta);
-                    tvEnunciado.setText(errorActual.pregunta);
-                }
-
-                return item;
-            }
-        };
-
+        ErrorAdapter adapter = new ErrorAdapter(requireContext(), errores);
         listView.setAdapter(adapter);
 
         return view;
