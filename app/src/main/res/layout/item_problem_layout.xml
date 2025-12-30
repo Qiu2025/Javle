@@ -39,7 +39,7 @@
                 android:contentDescription="Dificultad del problema"/>
 
             <TextView
-                android:id="@+id/tvDifficulty"
+                android:id="@+id/tvRespuestaCorrecta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Easy"
@@ -52,7 +52,7 @@
 
         <!-- Título -->
         <TextView
-            android:id="@+id/tvTitle"
+            android:id="@+id/tvEnunciado"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"

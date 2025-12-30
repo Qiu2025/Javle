@@ -40,8 +40,8 @@ public class EnunciadoActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.tvQuestionId)).setText("");
         String cargando = "Cargando...";
-        ((TextView) findViewById(R.id.tvTitle)).setText(cargando);
-        ((TextView) findViewById(R.id.tvDifficulty)).setText("");
+        ((TextView) findViewById(R.id.tvEnunciado)).setText(cargando);
+        ((TextView) findViewById(R.id.tvRespuestaCorrecta)).setText("");
 
         String id = getIntent().getStringExtra("ID");
         ConsultarEnunciadoThread task = new ConsultarEnunciadoThread(this,id);
@@ -63,14 +63,14 @@ public class EnunciadoActivity extends AppCompatActivity {
 
         if (enunciado == null || enunciado.content == null) {
             Toast.makeText(this, "El enunciado no está disponible", Toast.LENGTH_SHORT).show();
-            ((TextView) findViewById(R.id.tvTitle)).setText("");
+            ((TextView) findViewById(R.id.tvEnunciado)).setText("");
             return;
         }
 
         String id = "ID " + enunciado.questionId;
         ((TextView) findViewById(R.id.tvQuestionId)).setText(id);
-        ((TextView) findViewById(R.id.tvTitle)).setText(enunciado.title);
-        ((TextView) findViewById(R.id.tvDifficulty)).setText(enunciado.difficulty);
+        ((TextView) findViewById(R.id.tvEnunciado)).setText(enunciado.title);
+        ((TextView) findViewById(R.id.tvRespuestaCorrecta)).setText(enunciado.difficulty);
         ((TextView) findViewById(R.id.tvCategory)).setText(enunciado.categoryTitle);
 
         TextView tvHints = findViewById(R.id.tvHints);

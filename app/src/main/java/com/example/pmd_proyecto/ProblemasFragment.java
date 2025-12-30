@@ -47,7 +47,6 @@ public class ProblemasFragment extends Fragment {
 
         ConsultarProblemasThread task = new ConsultarProblemasThread(ProblemasFragment.this);
         new Thread(task).start();
-
     }
 
     public void mostrarProblemas(List<Problem> problemas){

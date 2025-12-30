@@ -51,10 +51,10 @@ public class ProblemAdapter extends BaseAdapter {
         ((TextView) convertView.findViewById(R.id.tvId))
                 .setText(id);
 
-        ((TextView) convertView.findViewById(R.id.tvTitle))
+        ((TextView) convertView.findViewById(R.id.tvEnunciado))
                 .setText(p.title);
 
-        ((TextView) convertView.findViewById(R.id.tvDifficulty))
+        ((TextView) convertView.findViewById(R.id.tvRespuestaCorrecta))
                 .setText(p.difficulty);
 
         ImageView imgDifficulty = convertView.findViewById(R.id.imgDifficulty);

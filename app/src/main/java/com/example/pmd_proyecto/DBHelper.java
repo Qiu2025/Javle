@@ -21,7 +21,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static DBHelper instance;   // unica instancia en la app
     private static final String DB_NAME = "app.db";
-    private static final int DB_VERSION = 13;
+    private static final int DB_VERSION = 14;
+
     private final Gson gson = new Gson();
 
     // Tablas
@@ -94,11 +95,12 @@ public class DBHelper extends SQLiteOpenHelper {
                         "FOREIGN KEY(email) REFERENCES usuarios(email))"
         );
 
-        // Para almacenar retos fallados
+        // Para almacenar errores en retos
         db.execSQL(
                 "CREATE TABLE " + TABLE_ERRORES + "(" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "email TEXT, " +
+                        "tema TEXT, " +
                         "pregunta TEXT, " +
                         "respuesta_correcta TEXT, " +
                         "fecha INTEGER)"
@@ -283,6 +285,7 @@ public class DBHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         values.put("email", email);
+        values.put("tema", reto.tema); // CAMBIO 3: Guardamos el tema
         values.put(COL_PREGUNTA_ERR, reto.pregunta);
         values.put(COL_RESPUESTA_ERR, reto.respuestaCorrecta);
         values.put(COL_FECHA, System.currentTimeMillis());
@@ -298,7 +301,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
                 "errores",
-                new String[]{"pregunta", "respuesta_correcta", "fecha"},
+                new String[]{"tema", "pregunta", "respuesta_correcta", "fecha"},
                 "email = ?",
                 new String[]{email},
                 null,
@@ -307,11 +310,12 @@ public class DBHelper extends SQLiteOpenHelper {
         );
 
         while (cursor.moveToNext()) {
-            String pregunta = cursor.getString(0);
-            String respuesta = cursor.getString(1);
-            long fecha = cursor.getLong(2);
+            String tema = cursor.getString(0); // Ahora indice 0 es tema
+            String pregunta = cursor.getString(1);
+            String respuesta = cursor.getString(2);
+            long fecha = cursor.getLong(3);
 
-            lista.add(new ErrorReto(pregunta, respuesta, fecha));
+            lista.add(new ErrorReto(tema, pregunta, respuesta, fecha));
         }
 
         cursor.close();
@@ -424,5 +428,4 @@ public class DBHelper extends SQLiteOpenHelper {
 
         return null;
     }
-
 }
