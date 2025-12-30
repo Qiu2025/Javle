@@ -21,8 +21,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static DBHelper instance;   // unica instancia en la app
     private static final String DB_NAME = "app.db";
-    private static final int DB_VERSION = 14;
-
+    private static final int DB_VERSION = 13;
     private final Gson gson = new Gson();
 
     // Tablas
@@ -34,6 +33,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TABLE_PROBLEMAS = "problemas";
 
     public static final String TABLE_ENUNCIADOS = "enunciados";
+    public static final String TABLE_PROBLEMA_DIA = "problema_dia";
 
     // Columnas TABLE_RETOS
     public static final String COL_ID = "_id";
@@ -95,12 +95,11 @@ public class DBHelper extends SQLiteOpenHelper {
                         "FOREIGN KEY(email) REFERENCES usuarios(email))"
         );
 
-        // Para almacenar errores en retos
+        // Para almacenar retos fallados
         db.execSQL(
                 "CREATE TABLE " + TABLE_ERRORES + "(" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "email TEXT, " +
-                        "tema TEXT, " +
                         "pregunta TEXT, " +
                         "respuesta_correcta TEXT, " +
                         "fecha INTEGER)"
@@ -122,6 +121,11 @@ public class DBHelper extends SQLiteOpenHelper {
                         "fetched_at INTEGER)"
         );
 
+        // Tabla para almacenar el problema del día
+        db.execSQL( "CREATE TABLE " + TABLE_PROBLEMA_DIA + " (" +
+                "id INTEGER PRIMARY KEY, " +
+                "json TEXT NOT NULL, " +
+                "fetched_at INTEGER)" );
     }
 
     @Override
@@ -132,6 +136,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ERRORES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROBLEMAS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ENUNCIADOS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROBLEMA_DIA);
 
         onCreate(db);
     }
@@ -285,7 +290,6 @@ public class DBHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         values.put("email", email);
-        values.put("tema", reto.tema); // CAMBIO 3: Guardamos el tema
         values.put(COL_PREGUNTA_ERR, reto.pregunta);
         values.put(COL_RESPUESTA_ERR, reto.respuestaCorrecta);
         values.put(COL_FECHA, System.currentTimeMillis());
@@ -428,4 +432,45 @@ public class DBHelper extends SQLiteOpenHelper {
 
         return null;
     }
+
+    public void guardarProblemaDia(EnunciadoProblema e) {
+        if (e == null) return;
+
+        String json = gson.toJson(e);
+        ContentValues values = new ContentValues();
+        values.put("id", 1);
+        values.put("json", json);
+        values.put("fetched_at", System.currentTimeMillis());
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.insertWithOnConflict(TABLE_PROBLEMA_DIA, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    public EnunciadoProblema obtenerProblemaDia() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.query(
+                TABLE_PROBLEMA_DIA,
+                new String[]{"json"},
+                "id = ?",
+                new String[]{"1"},
+                null,
+                null,
+                null
+        );
+
+        if (c != null && c.moveToFirst()) {
+            String json = c.getString(0);
+            c.close();
+
+            try {
+                return gson.fromJson(json, EnunciadoProblema.class);
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+
+        if (c != null) c.close();
+        return null;
+    }
+
 }

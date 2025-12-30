@@ -70,7 +70,7 @@ public class HomeFragment extends Fragment {
     }
 
     public void mostrarProblema(EnunciadoProblema enunciado) {
-        if (!isAdded()) return;
+        if (!isAdded() || getView() == null) return;
 
         problemaDia = enunciado;
 
