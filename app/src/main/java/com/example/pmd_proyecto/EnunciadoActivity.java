@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -91,23 +92,28 @@ public class EnunciadoActivity extends AppCompatActivity {
             tvTags.setText("");
         }
 
+        CardView cardHints = findViewById(R.id.cardHints);
 //        Botón para mostrar siguiente hint
         Button btnHint = findViewById(R.id.btnHints);
         List<String> hints = enunciado.hints;
-        btnHint.setEnabled(!hints.isEmpty());
-        hintIndex = 0;
-        btnHint.setOnClickListener(v -> {
-            if(hintIndex < hints.size()){
-                StringBuilder builder = new StringBuilder(tvHints.getText().toString());
-                if(hintIndex != 0) builder.append("\n\n");
-                builder.append("• Hint ").append(hintIndex+1).append(": ").append(hints.get(hintIndex));
-                tvHints.setText(builder.toString());
-                hintIndex++;
-                String hintsString = "Hints: " + (hints.size()-hintIndex);
-                hintsTitulo.setText(hintsString);
-                if(hintIndex == hints.size()) btnHint.setEnabled(false);
-            }
-        });
+        if (hints.isEmpty())  {
+            cardHints.setVisibility(View.GONE);
+        } else {
+            btnHint.setEnabled(true);
+            hintIndex = 0;
+            btnHint.setOnClickListener(v -> {
+                if(hintIndex < hints.size()){
+                    StringBuilder builder = new StringBuilder(tvHints.getText().toString());
+                    if(hintIndex != 0) builder.append("\n\n");
+                    builder.append("• Hint ").append(hintIndex+1).append(": ").append(hints.get(hintIndex));
+                    tvHints.setText(builder.toString());
+                    hintIndex++;
+                    String hintsString = "Hints: " + (hints.size()-hintIndex);
+                    hintsTitulo.setText(hintsString);
+                    if(hintIndex == hints.size()) btnHint.setEnabled(false);
+                }
+            });
+        }
 
 //        Usar WebView para mostrar el enunciado
         String html = enunciado.content;

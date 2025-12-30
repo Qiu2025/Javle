@@ -21,7 +21,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static DBHelper instance;   // unica instancia en la app
     private static final String DB_NAME = "app.db";
-    private static final int DB_VERSION = 12;
+    private static final int DB_VERSION = 13;
     private final Gson gson = new Gson();
 
     // Tablas
@@ -42,7 +42,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COL_OPCIONES = "opciones"; // Guardado como texto separado
     public static final String COL_RESPUESTA = "respuesta_correcta";
 
-    // Columnas TABLE_
+
     public static final String COL_EMAIL = "email";
     public static final String COL_ACIERTOS = "aciertos";
     public static final String COL_FALLOS = "fallos";
