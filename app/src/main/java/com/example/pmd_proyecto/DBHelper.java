@@ -17,7 +17,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static DBHelper instance;   // unica instancia en la app
     private static final String DB_NAME = "app.db";
-    private static final int DB_VERSION = 11;
+    private static final int DB_VERSION = 12;
 
     // Tablas
     public static final String TABLE_USUARIOS = "usuarios";
@@ -61,7 +61,8 @@ public class DBHelper extends SQLiteOpenHelper {
                         "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "email TEXT UNIQUE, " +
                         "password TEXT, " +
-                        "avatar TEXT)"
+                        "avatar TEXT, " +
+                        "pais TEXT)"
         );
 
         // Tabla para almacenar retos generados por Gemini

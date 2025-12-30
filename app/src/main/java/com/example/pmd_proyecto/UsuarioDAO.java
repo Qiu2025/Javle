@@ -24,12 +24,13 @@ public class UsuarioDAO {
         return existe;
     }
 
-    public static boolean registrar(Context context, String email, String password) {
+    public static boolean registrar(Context context, String email, String password, String pais) {
         SQLiteDatabase db = DBHelper.getInstance(context).getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put("email", email);
         values.put("password", password);
+        values.put("pais", pais);
 
         long result = db.insert("usuarios", null, values);
 

@@ -35,6 +35,8 @@ public class YoFragment extends Fragment {
     private ActivityResultLauncher<Uri> tomarFoto;
     private Uri uriFotoCamara;
     private ImageView avatarView;
+    private TextView tvPaisPerfil;
+
 
     public YoFragment() {
         // Required empty public constructor
@@ -103,6 +105,7 @@ public class YoFragment extends Fragment {
         avatarView = view.findViewById(R.id.imageView);
         TextView tvEmail = view.findViewById(R.id.tvEmailPerfil);
         TextView tvNombre = view.findViewById(R.id.tvNombrePerfil);
+        tvPaisPerfil = view.findViewById(R.id.tvPaisPerfil);
 
         avatarView.setOnClickListener(v -> mostrarOpcionesAvatar());
 
@@ -119,7 +122,7 @@ public class YoFragment extends Fragment {
             SQLiteDatabase db = DBHelper.getInstance(requireContext()).getReadableDatabase();
 
             Cursor c = db.rawQuery(
-                    "SELECT avatar FROM usuarios WHERE email = ?",
+                    "SELECT avatar, pais FROM usuarios WHERE email = ?",
                     new String[]{email}
             );
 
@@ -128,7 +131,13 @@ public class YoFragment extends Fragment {
                 if (avatarUriString != null) {
                     avatarView.setImageURI(Uri.parse(avatarUriString));
                 }
+
+                String pais = c.getString(1);
+                if (pais != null && !pais.isEmpty()) {
+                    tvPaisPerfil.setText(pais);
+                }
             }
+
             c.close();
         }
 
@@ -174,12 +183,7 @@ public class YoFragment extends Fragment {
                 new String[]{email}
         );
 
-        // Recargar perfil
-        requireActivity()
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainerView, new YoFragment())
-                .commit();
+        avatarView.setImageURI(localUri);
     }
 
     private Uri crearUriFoto() {

@@ -31,6 +31,13 @@
                 android:textSize="12sp"
                 android:textColor="#6B7280" />
 
+            <ImageView
+                android:id="@+id/imgDifficulty"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="6dp"
+                android:contentDescription="Dificultad del problema"/>
+
             <TextView
                 android:id="@+id/tvDifficulty"
                 android:layout_width="wrap_content"

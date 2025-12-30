@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.ImageView;
+
 
 import com.example.pmd_proyecto.model.Problem;
 
@@ -54,6 +56,20 @@ public class ProblemAdapter extends BaseAdapter {
 
         ((TextView) convertView.findViewById(R.id.tvDifficulty))
                 .setText(p.difficulty);
+
+        ImageView imgDifficulty = convertView.findViewById(R.id.imgDifficulty);
+
+        if (p.difficulty == null) {
+            imgDifficulty.setVisibility(View.GONE);
+        }
+
+        if ("Easy".equalsIgnoreCase(p.difficulty)) {
+            imgDifficulty.setImageResource(R.drawable.ic_easy);
+        } else if ("Medium".equalsIgnoreCase(p.difficulty)) {
+            imgDifficulty.setImageResource(R.drawable.ic_medium);
+        } else {
+            imgDifficulty.setImageResource(R.drawable.ic_hard);
+        }
 
         return convertView;
     }
