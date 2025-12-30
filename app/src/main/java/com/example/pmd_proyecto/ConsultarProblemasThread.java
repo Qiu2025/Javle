@@ -8,23 +8,32 @@ import java.util.List;
 
 public class ConsultarProblemasThread implements Runnable {
     ProblemasFragment fragment;
+    DBHelper db;
+    List<Problem> problemas;
 
     public ConsultarProblemasThread(ProblemasFragment fragment){
         this.fragment = fragment;
+        Activity ctx = fragment.getActivity();
+        if (ctx != null) {
+            db = DBHelper.getInstance(ctx);
+        }
     }
+
     @Override
     public void run() {
         try{
-            List<Problem> problemas = NetUtils.ConsultarProblemas();
-            Activity ctx = fragment.getActivity();
+//            Primero intentamos obtenerlo de la base de datos
+            if (db != null) problemas = db.obtenerProblemas();
 
+            if (problemas == null) {
+//                Si no lo encuentra, lo consultamos a la API
+                problemas = NetUtils.ConsultarProblemas();
+                if (db != null && problemas != null) db.guardarProblemas(problemas);
+            }
+
+            Activity ctx = fragment.getActivity();
             if (ctx == null) return;
-            ctx.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    fragment.mostrarProblemas(problemas);
-                }
-            });
+            ctx.runOnUiThread(() -> fragment.mostrarProblemas(problemas));
         } catch (Exception e){
             e.printStackTrace();
         }

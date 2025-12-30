@@ -7,8 +7,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.example.pmd_proyecto.model.EnunciadoProblema;
 import com.example.pmd_proyecto.model.ErrorReto;
+import com.example.pmd_proyecto.model.Problem;
 import com.example.pmd_proyecto.model.RetoProgramacion;
+import com.google.gson.Gson;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,12 +22,17 @@ public class DBHelper extends SQLiteOpenHelper {
     public static DBHelper instance;   // unica instancia en la app
     private static final String DB_NAME = "app.db";
     private static final int DB_VERSION = 12;
+    private final Gson gson = new Gson();
 
     // Tablas
     public static final String TABLE_USUARIOS = "usuarios";
     public static final String TABLE_RETOS = "retos";
     public static final String TABLE_PROGRESO = "progreso";
     public static final String TABLE_ERRORES = "errores";
+
+    public static final String TABLE_PROBLEMAS = "problemas";
+
+    public static final String TABLE_ENUNCIADOS = "enunciados";
 
     // Columnas TABLE_RETOS
     public static final String COL_ID = "_id";
@@ -94,6 +103,23 @@ public class DBHelper extends SQLiteOpenHelper {
                         "respuesta_correcta TEXT, " +
                         "fecha INTEGER)"
         );
+
+        // Para almacenar problemas encontrados
+        db.execSQL(
+                "CREATE TABLE " + TABLE_PROBLEMAS + "(" +
+                        "frontend_id INTEGER PRIMARY KEY, " +
+                        "title TEXT, " +
+                        "difficulty TEXT)"
+        );
+
+        // Tabla para almacenar enunciados (cache offline)
+        db.execSQL(
+                "CREATE TABLE " + TABLE_ENUNCIADOS + " (" +
+                        "questionId TEXT PRIMARY KEY, " +
+                        "json TEXT NOT NULL, " +
+                        "fetched_at INTEGER)"
+        );
+
     }
 
     @Override
@@ -102,6 +128,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RETOS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROGRESO);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ERRORES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROBLEMAS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ENUNCIADOS);
 
         onCreate(db);
     }
@@ -289,4 +317,112 @@ public class DBHelper extends SQLiteOpenHelper {
         cursor.close();
         return lista;
     }
+
+    public void guardarProblemas(List<Problem> lista) {
+        if (lista == null || lista.isEmpty()) return;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+
+        try {
+            for (Problem p : lista) {
+                if (p == null || p.frontend_id == null) continue;
+
+                ContentValues values = new ContentValues();
+                values.put("frontend_id", p.frontend_id);
+                values.put("title", p.title);
+                values.put("difficulty", p.difficulty);
+
+                db.insertWithOnConflict(TABLE_PROBLEMAS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public List<Problem> obtenerProblemas() {
+        List<Problem> lista = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.query(
+                    TABLE_PROBLEMAS,
+                    new String[]{"frontend_id", "title", "difficulty"},
+                    null,
+                    null,
+                    null,
+                    null,
+                    "frontend_id ASC"
+            );
+
+            if (cursor == null) return null;
+
+            while (cursor.moveToNext()) {
+                Problem p = new Problem();
+                p.frontend_id = cursor.getInt(cursor.getColumnIndexOrThrow("frontend_id"));
+                p.title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+                p.difficulty = cursor.getString(cursor.getColumnIndexOrThrow("difficulty"));
+
+                lista.add(p);
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+
+        // Si no hay datos, devolvemos null para usarlo como comprobacion de cache
+        if (lista.isEmpty()) return null;
+
+        return lista;
+    }
+
+    public void guardarEnunciado(EnunciadoProblema enunciado) {
+        if (enunciado == null || enunciado.questionId == null) return;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("questionId", enunciado.questionId);
+        values.put("json", gson.toJson(enunciado));
+        values.put("fetched_at", System.currentTimeMillis());
+
+        db.insertWithOnConflict(TABLE_ENUNCIADOS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    public EnunciadoProblema obtenerEnunciado(String questionId) {
+        if (questionId == null) return null;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.query(
+                    TABLE_ENUNCIADOS,
+                    new String[]{"json"},
+                    "questionId = ?",
+                    new String[]{questionId},
+                    null,
+                    null,
+                    null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                String json = cursor.getString(cursor.getColumnIndexOrThrow("json"));
+                if (json == null || json.isEmpty()) return null;
+
+                return gson.fromJson(json, EnunciadoProblema.class);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+
+        return null;
+    }
+
 }
