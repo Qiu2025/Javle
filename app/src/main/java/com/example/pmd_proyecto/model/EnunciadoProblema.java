@@ -2,7 +2,7 @@ package com.example.pmd_proyecto.model;
 import java.util.List;
 
 public class EnunciadoProblema {
-    public String questionId;
+    public String questionFrontendId;
     public String title;
     public String url;
     public String difficulty;

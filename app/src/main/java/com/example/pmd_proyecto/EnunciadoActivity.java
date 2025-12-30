@@ -67,7 +67,7 @@ public class EnunciadoActivity extends AppCompatActivity {
             return;
         }
 
-        String id = "ID " + enunciado.questionId;
+        String id = "ID " + enunciado.questionFrontendId;
         ((TextView) findViewById(R.id.tvQuestionId)).setText(id);
         ((TextView) findViewById(R.id.tvTitle)).setText(enunciado.title);
         ((TextView) findViewById(R.id.tvDifficulty)).setText(enunciado.difficulty);
