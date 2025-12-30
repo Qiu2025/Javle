@@ -47,8 +47,6 @@ public class Home extends AppCompatActivity {
             return insets;
         });
 
-        DailyJobScheduler.schedule(this);
-
         BottomNavigationView bottomNav = findViewById(R.id.menu);
 
         // Crear instancias una vez
