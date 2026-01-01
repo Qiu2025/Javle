@@ -21,7 +21,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static DBHelper instance;   // unica instancia en la app
     private static final String DB_NAME = "app.db";
-    private static final int DB_VERSION = 14;
+    private static final int DB_VERSION = 15; // Versión incrementada para las nuevas columnas de errores
 
     private final Gson gson = new Gson();
 
@@ -95,7 +95,7 @@ public class DBHelper extends SQLiteOpenHelper {
                         "FOREIGN KEY(email) REFERENCES usuarios(email))"
         );
 
-        // Para almacenar errores en retos
+        // Para almacenar errores en retos (Modificada para guardar el contexto del fallo)
         db.execSQL(
                 "CREATE TABLE " + TABLE_ERRORES + "(" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -103,6 +103,9 @@ public class DBHelper extends SQLiteOpenHelper {
                         "tema TEXT, " +
                         "pregunta TEXT, " +
                         "respuesta_correcta TEXT, " +
+                        "respuesta_usuario TEXT, " +
+                        "codigo TEXT, " +
+                        "opciones TEXT, " +
                         "fecha INTEGER)"
         );
 
@@ -278,16 +281,25 @@ public class DBHelper extends SQLiteOpenHelper {
         return resultado;
     }
 
-    public void guardarError(String email, RetoProgramacion reto) {
+    public void guardarError(String email, RetoProgramacion reto, String respuestaUsuario) {
         if (email == null || reto == null) return;
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
         values.put("email", email);
-        values.put("tema", reto.tema); // CAMBIO 3: Guardamos el tema
+        values.put("tema", reto.tema);
         values.put(COL_PREGUNTA_ERR, reto.pregunta);
         values.put(COL_RESPUESTA_ERR, reto.respuestaCorrecta);
+        values.put("respuesta_usuario", respuestaUsuario);
+        values.put("codigo", reto.codigo);
+
+        String opcionesStr = "";
+        if (reto.opciones != null) {
+            opcionesStr = TextUtils.join("##", reto.opciones);
+        }
+        values.put("opciones", opcionesStr);
+
         values.put(COL_FECHA, System.currentTimeMillis());
 
         db.insert(TABLE_ERRORES, null, values);
@@ -301,7 +313,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
                 "errores",
-                new String[]{"tema", "pregunta", "respuesta_correcta", "fecha"},
+                null,
                 "email = ?",
                 new String[]{email},
                 null,
@@ -310,12 +322,21 @@ public class DBHelper extends SQLiteOpenHelper {
         );
 
         while (cursor.moveToNext()) {
-            String tema = cursor.getString(0); // Ahora indice 0 es tema
-            String pregunta = cursor.getString(1);
-            String respuesta = cursor.getString(2);
-            long fecha = cursor.getLong(3);
+            String tema = cursor.getString(cursor.getColumnIndexOrThrow("tema"));
+            String pregunta = cursor.getString(cursor.getColumnIndexOrThrow("pregunta"));
+            String respuesta = cursor.getString(cursor.getColumnIndexOrThrow("respuesta_correcta"));
+            long fecha = cursor.getLong(cursor.getColumnIndexOrThrow("fecha"));
 
-            lista.add(new ErrorReto(tema, pregunta, respuesta, fecha));
+            String resUsuario = cursor.getString(cursor.getColumnIndexOrThrow("respuesta_usuario"));
+            String codigo = cursor.getString(cursor.getColumnIndexOrThrow("codigo"));
+            String opcRaw = cursor.getString(cursor.getColumnIndexOrThrow("opciones"));
+
+            List<String> opciones = new ArrayList<>();
+            if (opcRaw != null && !opcRaw.isEmpty()) {
+                opciones = Arrays.asList(opcRaw.split("##"));
+            }
+
+            lista.add(new ErrorReto(tema, pregunta, respuesta, resUsuario, codigo, opciones, fecha));
         }
 
         cursor.close();

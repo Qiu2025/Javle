@@ -1,6 +1,7 @@
 package com.example.pmd_proyecto;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.pmd_proyecto.model.ErrorReto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ErrorAdapter extends BaseAdapter {
@@ -49,13 +51,25 @@ public class ErrorAdapter extends BaseAdapter {
 
         ErrorReto er = datos.get(i);
         if (er != null) {
-            String tema = er.tema != null ? er.tema : "Desconocido";
-            String pregunta = er.pregunta != null ? er.pregunta : "Desconocido";
-            String respuesta = er.respuestaCorrecta != null ? er.respuestaCorrecta : "-";
+            tvTema.setText("Tema: " + (er.tema != null ? er.tema : "Desconocido"));
+            tvEnunciado.setText(er.pregunta != null ? er.pregunta : "Desconocido");
+            tvRespuesta.setText(er.respuestaCorrecta != null ? er.respuestaCorrecta : "-");
 
-            tvTema.setText("Tema: " + tema);
-            tvEnunciado.setText(pregunta);
-            tvRespuesta.setText(respuesta);
+            convertView.setOnClickListener(v -> {
+                Intent intent = new Intent(ctx, RetosActivity.class);
+                intent.putExtra("MODO_REVISION", true);
+                intent.putExtra("TEMA", er.tema);
+                intent.putExtra("PREGUNTA", er.pregunta);
+                intent.putExtra("CODIGO", er.codigo);
+                intent.putExtra("CORRECTA", er.respuestaCorrecta);
+                intent.putExtra("USUARIO", er.respuestaUsuario);
+
+                if (er.opciones != null) {
+                    intent.putStringArrayListExtra("OPCIONES", new ArrayList<>(er.opciones));
+                }
+
+                ctx.startActivity(intent);
+            });
         }
 
         return convertView;
