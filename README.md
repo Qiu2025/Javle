@@ -21,7 +21,7 @@ Link to a presentation (in Spanish): https://www.canva.com/design/DAG86XJxqqo/0h
 - Notifications: A notification system that tells the user when the questions have been refilled in the database.
 
 ## 🛠️ Technologies Used
-- Language: Java.
+- Language: Java 17
 
 - Development Environment: Android Studio.
 
@@ -41,5 +41,10 @@ Add the following line:
 Properties
 
 GEMINI_API_KEY=YOUR_API_KEY_HERE
+
+And also have the following versions:
+* **Minimum SDK:** 24 (Android 7.0 Nougat)
+* **Target SDK:** 36 (Android 16 - Preview/Experimental)
+* **Java Version:** 17
 
 And finally, build the project from Android Studio.
