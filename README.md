@@ -35,10 +35,3 @@ This project was developed in a limited time frame as part of an academic assign
 For example, AI-generated challenges may tend to be very similar to each other. This happens because each API call is independent and uses the same prompt structure, which can lead to repetitive outputs.  
 
 The project prioritizes demonstrating core concepts (API integration, local persistence, Android components) rather than production-level robustness or optimization.
-
-## About
-Project developed by:  
-- Jiade Zheng - [@jiade-git](https://github.com/jiade-git)
-- Yixiao Yao - [@MASKYX](https://github.com/MASKYX)
-- Siyuan Qiu - [@Qiu2025](https://github.com/Qiu2025)
-- Shuhang Pan - [@usshng](https://github.com/usshng)
