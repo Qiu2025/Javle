@@ -33,7 +33,7 @@ Link to a presentation (in Spanish): [Canva](https://www.canva.com/design/DAG86X
 - **Local Persistence**: Uses an SQLite database to manage the challenge queue, user progress, and saved errors.
 - **Notifications**: A notification system that tells the user when the questions have been refilled in the database.
 
-## Technologies Used
+## Tech Stack
 - **Language**: Java 17
 - **Development Environment**: Android Studio.
 - **Artificial Intelligence**: Google Gemini API (Dynamic content generation).
