@@ -1,16 +1,39 @@
-# Javle - Java Learning App 🚀
+# Javle - Java Learning App
 Javle is an Android application designed to learn and practice Java interactively. The project leverages Artificial Intelligence to generate personalized challenges and integrates with external platforms to provide real-world algorithm problems.
 
 Link to a presentation (in Spanish): [Canva](https://www.canva.com/design/DAG86XJxqqo/0hkG2xX90VmcMxjMzKOjYA/view?utm_content=DAG86XJxqqo&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=heba34db684)
 
-## ✨ Features 
+## Preview
+
+<p align="center">
+   <img src="/Screenshots/Home.png" width="20%">
+   <img src="/Screenshots/Challenges.png" width="20%">
+   <img src="/Screenshots/Problems.png" width="20%">
+   <img src="/Screenshots/User.png" width="20%">
+</p>
+
+<details>
+   <summary><b> Click for more </b></summary>
+   <br>
+   <p align="center">
+     <img src="/Screenshots/AChallenge.png" width="20%">
+     <img src="/Screenshots/History.png" width="20%">
+     <img src="/Screenshots/AProblem1.png" width="20%">
+     <img src="/Screenshots/AProblem2.png" width="20%">
+     <img src="/Screenshots/Login1.png" width="20%">
+     <img src="/Screenshots/Login2.png" width="20%">
+     <img src="/Screenshots/Login3.png" width="20%">
+</p>
+</details>
+
+## Features 
 - **AI-Powered Challenges**: Generation of multiple-choice questions (MCQs) about Java programming using the Google Gemini API. These tests are designed to evaluate and improve your Java programming fundamentals.
 - **Problem of the Day**: A randomly selected problem from LeetCode for daily practice!
 - **Error History**: A system that saves mistakes done by users so they can review the concepts they found the most hard.
 - **Local Persistence**: Uses an SQLite database to manage the challenge queue, user progress, and saved errors.
 - **Notifications**: A notification system that tells the user when the questions have been refilled in the database.
 
-## 🛠️ Technologies Used
+## Technologies Used
 - **Language**: Java 17
 - **Development Environment**: Android Studio.
 - **Artificial Intelligence**: Google Gemini API (Dynamic content generation).
